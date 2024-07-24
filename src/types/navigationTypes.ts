@@ -15,7 +15,12 @@ export type RootStackParamList = {
   };
   BottomTabs: undefined;
   Detail: { farmacia: Farmacia };
-  Permission: undefined
+  Permission: undefined;
+  Login: undefined;
+  Register: undefined;
+  Profile: undefined;
+  Turno: undefined;
+  Settings: undefined;
   
 
   };

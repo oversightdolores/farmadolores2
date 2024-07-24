@@ -96,7 +96,7 @@ const Turno: React.FC = () => {
     const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
 
     // Programar notificación inicial a las 8:30 AM
-    const notificationTime1 = DateTime.local().set({
+    const notificationTime1 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
       hour: 8,
       minute: 30,
       second: 0,
@@ -116,10 +116,20 @@ const Turno: React.FC = () => {
           android: {
             channelId: 'default',
             importance: AndroidImportance.HIGH,
+            actions: [
+              {
+                title: 'Ver Farmacia',
+                pressAction: {
+                  id: 'viewFarmacia',
+                  launchActivity: 'default',
+                },
+              },
+            ],
             pressAction: {
               id: 'default',
               launchActivity: 'default',
-            }
+
+            },
           },
         },
         trigger1
@@ -127,7 +137,7 @@ const Turno: React.FC = () => {
     }
 
     // Recordatorio al mediodía
-    const notificationTime2 = DateTime.local().set({
+    const notificationTime2 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
       hour: 12,
       minute: 0,
       second: 0,
@@ -147,11 +157,23 @@ const Turno: React.FC = () => {
           android: {
             channelId: 'default',
             importance: AndroidImportance.HIGH,
+            timestamp: notificationTime2.toMillis(),
+            actions: [
+              {
+                title: 'Ver Farmacia',
+                pressAction: {
+                  id: 'viewFarmacia',
+                  launchActivity: 'default',
+                },
+              },
+            ],
             pressAction: {
               id: 'default',
               launchActivity: 'default',
-            }
+
+            },
           },
+          data: { name: farmacia.name, dir: farmacia.dir,  image: farmacia.image, detail: farmacia.detail },
         },
         trigger2
       );
@@ -159,8 +181,8 @@ const Turno: React.FC = () => {
 
     // Recordatorio en la tarde
     const notificationTime3 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
-      hour: 23,
-      minute: 3,
+      hour: 20,
+      minute: 0,
       second: 0,
       millisecond: 0,
     });
@@ -208,9 +230,7 @@ const Turno: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Turno</Text>
       {farmaciaDeTurno ? (
-        console.log('farmaciaDeTurno', true),
         <TurnoCard item={farmaciaDeTurno} onPress={(item) => {}} />
       ) : (
         <View style={styles.noTurnos}>

@@ -29,6 +29,7 @@ import { NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './src/components/BottomTabs';
 import AppNavigator from './src/pages/AppNavigator';
+import { AuthContextProvider } from './src/context/AuthContext';
 
 
 export type RootStackParamList = {
@@ -48,20 +49,15 @@ function App({...rest}): React.JSX.Element {
   };
 
   return (
-    <  >
+    <AuthContextProvider>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
-      />
+        />
       
      <AppNavigator />
+        </AuthContextProvider>
       
-      
-
-
-
-      
-      </  >
   );
 }
 
