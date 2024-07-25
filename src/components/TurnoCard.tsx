@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { NavigationProp } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 type Farmacia = {
   id: string;
@@ -15,7 +16,7 @@ type Farmacia = {
   horarioCierreTarde?: string;
   image: string;
   detail: string;
-  turn: any; // Puede ajustar esto según sea necesario
+  turn: any; // Ajusta esto según sea necesario
 };
 
 type TurnoCardProps = {
@@ -25,21 +26,24 @@ type TurnoCardProps = {
 
 const TurnoCard: React.FC<TurnoCardProps> = ({ item, onPress }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { theme } = useTheme();
+  const { colors } = theme;
+
   const { name, dir, tel, horarioAperturaMañana, horarioCierreMañana, horarioAperturaTarde, horarioCierreTarde, detail } = item;
 
   return (
     <TouchableOpacity onPress={() => navigation.navigate('Detail', { farmacia: item })}>
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Image source={{ uri: detail }} style={styles.image} />
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{name}</Text>
-          <Text style={styles.info}>Dirección: {dir}</Text>
-          <Text style={styles.info}>Teléfono: {tel}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
           {horarioAperturaMañana && horarioCierreMañana && (
-            <Text style={styles.info}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
+            <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
           )}
           {horarioAperturaTarde && horarioCierreTarde && (
-            <Text style={styles.info}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
+            <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
           )}
         </View>
         <View style={styles.turnoBadge}>
@@ -54,7 +58,6 @@ export default TurnoCard;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Alert } from 'react-native';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { DateTime } from 'luxon';
 import notifee, { TriggerType, TimestampTrigger, AndroidImportance } from '@notifee/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import TurnoCard from './TurnoCard';
 
 type Farmacia = {
@@ -47,7 +48,7 @@ const Turno: React.FC = () => {
       const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
       const turnStartBase = DateTime.local().set({
         hour: 8,
-        minute: 30,
+        minute: 35,
         second: 0,
         millisecond: 0,
       });
@@ -81,7 +82,11 @@ const Turno: React.FC = () => {
 
       if (matchingPharmacy) {
         setFarmaciaDeTurno(matchingPharmacy);
-        scheduleNotifications(matchingPharmacy);
+        const notificationState = await AsyncStorage.getItem(`notification_${matchingPharmacy.id}`);
+        if (!notificationState) {
+          await scheduleNotifications(matchingPharmacy);
+          await AsyncStorage.setItem(`notification_${matchingPharmacy.id}`, 'scheduled');
+        }
       } else {
         setFarmaciaDeTurno(null);
       }
@@ -95,132 +100,68 @@ const Turno: React.FC = () => {
   const scheduleNotifications = async (farmacia: FarmaciaConTiempos) => {
     const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
 
-    // Programar notificación inicial a las 8:30 AM
-    const notificationTime1 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
-      hour: 8,
-      minute: 35,
-      second: 0,
-      millisecond: 0,
-    });
+    const notifications = [
+      {
+        hour: 8,
+        minute: 35,
+        title: 'Cambio de Turno',
+        body: `La farmacia de turno es ${farmacia.name}`,
+      },
+      {
+        hour: 12,
+        minute: 0,
+        title: 'Recordatorio de Turno',
+        body: `La farmacia de turno sigue siendo ${farmacia.name}`,
+      },
+      {
+        hour: 20,
+        minute: 0,
+        title: 'Recordatorio de Turno',
+        body: `La farmacia de turno sigue siendo ${farmacia.name}`,
+      },
+    ];
 
-    if (notificationTime1 > now) {
-      const trigger1: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: notificationTime1.toMillis(),
-      };
+    for (const { hour, minute, title, body } of notifications) {
+      const notificationTime = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
+        hour,
+        minute,
+        second: 0,
+        millisecond: 0,
+      });
 
-      await notifee.createTriggerNotification(
-        {
-          title: 'Cambio de Turno',
-          body: `La farmacia de turno es ${farmacia.name}`,
-          android: {
-            channelId: 'default',
-            importance: AndroidImportance.HIGH,
-            actions: [
-              {
-                title: 'Ver Farmacia',
-                pressAction: {
-                  id: 'viewFarmacia',
-                  launchActivity: 'default',
+      if (notificationTime > now) {
+        const trigger: TimestampTrigger = {
+          type: TriggerType.TIMESTAMP,
+          timestamp: notificationTime.toMillis(),
+        };
+
+        await notifee.createTriggerNotification(
+          {
+            title,
+            body,
+            android: {
+              channelId: 'default',
+              importance: AndroidImportance.HIGH,
+              sound: 'default',
+              actions: [
+                {
+                  title: 'Ver Farmacia',
+                  pressAction: {
+                    id: 'viewFarmacia',
+                    launchActivity: 'default',
+                  },
                 },
+              ],
+              pressAction: {
+                id: 'default',
+                launchActivity: 'default',
               },
-            ],
-            pressAction: {
-              id: 'default',
-              launchActivity: 'default',
-
             },
+            data: { name: farmacia.name, dir: farmacia.dir, image: farmacia.image, detail: farmacia.detail },
           },
-        },
-        trigger1
-      );
-    }
-
-    // Recordatorio al mediodía
-    const notificationTime2 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
-      hour: 12,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    });
-
-    if (notificationTime2 > now) {
-      const trigger2: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: notificationTime2.toMillis(),
-      };
-
-      await notifee.createTriggerNotification(
-        {
-          title: 'Recordatorio de Turno',
-          body: `La farmacia de turno sigue siendo ${farmacia.name}`,
-          android: {
-            channelId: 'default',
-            importance: AndroidImportance.HIGH,
-            timestamp: notificationTime2.toMillis(),
-            actions: [
-              {
-                title: 'Ver Farmacia',
-                pressAction: {
-                  id: 'viewFarmacia',
-                  launchActivity: 'default',
-                },
-              },
-            ],
-            pressAction: {
-              id: 'default',
-              launchActivity: 'default',
-
-            },
-          },
-          data: { name: farmacia.name, dir: farmacia.dir,  image: farmacia.image, detail: farmacia.detail },
-        },
-        trigger2
-      );
-    }
-
-    // Recordatorio en la tarde
-    const notificationTime3 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
-      hour: 20,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    });
-
-    console.log('notificationTime3',  notificationTime3 ); 
-    if (notificationTime3 > now) {
-      const trigger3: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: notificationTime3.toMillis(),
-      };
-
-      await notifee.createTriggerNotification(
-        {
-          title: 'Recordatorio de Turno',
-          body: `La farmacia de turno sigue siendo ${farmacia.name}`,
-          android: {
-            channelId: 'default',
-            importance: AndroidImportance.HIGH,
-            timestamp: notificationTime3.toMillis(),
-            actions: [
-              {
-                title: 'Ver Farmacia',
-                pressAction: {
-                  id: 'viewFarmacia',
-                  launchActivity: 'default',
-                },
-              },
-            ],
-            pressAction: {
-              id: 'default',
-              launchActivity: 'default',
-
-            },
-          },
-          data: { name: farmacia.name, dir: farmacia.dir,  image: farmacia.image, detail: farmacia.detail },
-        },
-        trigger3
-      );
+          trigger
+        );
+      }
     }
   };
 
@@ -231,7 +172,7 @@ const Turno: React.FC = () => {
   return (
     <View style={styles.container}>
       {farmaciaDeTurno ? (
-        <TurnoCard item={farmaciaDeTurno} onPress={(item) => {}} />
+        <TurnoCard item={farmaciaDeTurno} onPress={(item) => { }} />
       ) : (
         <View style={styles.noTurnos}>
           <Text style={styles.noTurnosText}>No hay farmacias de turno en este momento</Text>
@@ -246,8 +187,6 @@ export default Turno;
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
-   
-    backgroundColor: '#f8f9fa',
   },
   noTurnos: {
     flex: 1,

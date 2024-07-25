@@ -39,7 +39,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   App: undefined;
   Auth: undefined;
-  
+  Drawer: undefined;
 
   };
   

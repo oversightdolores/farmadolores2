@@ -54,4 +54,3 @@ const App: React.FC = ({...rest}): React.JSX.Element => {
 }
 
 export default codePush(codePushOptions)(App);
-  

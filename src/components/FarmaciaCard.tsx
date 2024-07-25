@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { NavigationProp } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 type Farmacia = {
   id: string;
@@ -28,6 +29,8 @@ type FarmaciaCardProps = {
 
 const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { theme } = useTheme();
+  const { colors } = theme;
   const { name, dir, tel, horarioAperturaMañana, horarioCierreMañana, horarioAperturaTarde, horarioCierreTarde, detail } = item;
   const [status, setStatus] = useState<Status>('Cerrado');
 
@@ -72,14 +75,14 @@ const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
 
   return (
     <TouchableOpacity onPress={() => navigation.navigate('Detail', { farmacia: item })}>
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Image source={{ uri: detail }} style={styles.image} />
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{name}</Text>
-          <Text style={styles.info}>Dirección: {dir}</Text>
-          <Text style={styles.info}>Teléfono: {tel}</Text>
-          <Text style={styles.info}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
-          <Text style={styles.info}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
         </View>
         <View style={[styles.statusBadge, statusStyles[status]]}>
           <Text style={styles.statusText}>{status}</Text>
@@ -93,7 +96,6 @@ export default FarmaciaCard;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,

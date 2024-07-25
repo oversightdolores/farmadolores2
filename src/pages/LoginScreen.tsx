@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 const Login: React.FC = () => {
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -37,38 +39,38 @@ const Login: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Bienvenido</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Bienvenido</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
-        placeholderTextColor="#999"
+        placeholderTextColor={colors.placeholderText}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        placeholderTextColor="#999"
+        placeholderTextColor={colors.placeholderText}
       />
       {loading ? (
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color={colors.notification} />
       ) : (
         <>
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Iniciar sesión</Text>
+          <TouchableOpacity style={[styles.button, { backgroundColor: colors.buttonBackground }]} onPress={handleLogin}>
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Iniciar sesión</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleLogin}>
+          <TouchableOpacity style={[styles.button, styles.googleButton, { backgroundColor: '#db4437' }]} onPress={handleGoogleLogin}>
             <Icon name="google" size={20} color="#fff" style={styles.googleIcon} />
-            <Text style={styles.buttonText}>Iniciar sesión con Google</Text>
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Iniciar sesión con Google</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
-            <Text style={[styles.buttonText, styles.registerButtonText]}>Registrarse</Text>
+          <TouchableOpacity style={[styles.button, styles.registerButton, { borderColor: colors.primary }]} onPress={handleRegister}>
+            <Text style={[styles.buttonText, styles.registerButtonText, { color: colors.primary }]}>Registrarse</Text>
           </TouchableOpacity>
         </>
       )}
@@ -84,7 +86,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
   },
   logo: {
     width: 100,
@@ -94,36 +95,29 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 20,
   },
   input: {
     width: '100%',
     padding: 15,
-    borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 15,
-    backgroundColor: '#fff',
     fontSize: 16,
-    color: '#333',
   },
   button: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#007bff',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
   googleButton: {
-    backgroundColor: '#db4437',
     flexDirection: 'row',
   },
   googleIcon: {
@@ -131,7 +125,6 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     backgroundColor: 'transparent',
-    borderColor: '#007bff',
     borderWidth: 1,
   },
   registerButtonText: {

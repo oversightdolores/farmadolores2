@@ -64,7 +64,7 @@ const BottomTabs: React.FC = () => {
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
       <Tab.Screen name="Farmacias" options={{ headerShown: false }} component={Farmacias} />
       <Tab.Screen name="Emergencias" options={{ headerShown: false }} component={Emergencias} />
-      <Tab.Screen name="Perfil" component={Perfil} />
+      <Tab.Screen name="Perfil"  options={{ headerShown: false }} component={Perfil} />
     </Tab.Navigator>
   );
 };

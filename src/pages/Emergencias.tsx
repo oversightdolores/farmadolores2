@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
+import { useTheme } from '../context/ThemeContext';
 
 type Emergencia = {
   id: string;
@@ -26,15 +27,17 @@ type Props = {
 
 const EmergenciaCard: React.FC<EmergenciaCardProps> = ({ item, onPress }) => {
   const { name, dir, tel, image, detail } = item;
+  const { theme } = useTheme();
+  const { colors } = theme;
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={styles.card}>
+      <View style={[styles.card, {backgroundColor: colors.card}  ]}>
         <Image source={{ uri: detail }} style={styles.image} />
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{name}</Text>
-          <Text style={styles.info}>Dirección: {dir}</Text>
-          <Text style={styles.info}>Teléfono: {tel}</Text>
+          <Text style={[styles.title, {color: colors.text}]}>{name}</Text>
+          <Text style={[styles.info, {color: colors.text}]}>Dirección: {dir}</Text>
+          <Text style={[styles.info, {color: colors.text}]}>Teléfono: {tel}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -95,7 +98,7 @@ export default Emergencias;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    
   },
   listContainer: {
     padding: 20,
