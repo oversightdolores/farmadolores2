@@ -98,7 +98,7 @@ const Turno: React.FC = () => {
     // Programar notificación inicial a las 8:30 AM
     const notificationTime1 = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
       hour: 8,
-      minute: 30,
+      minute: 35,
       second: 0,
       millisecond: 0,
     });

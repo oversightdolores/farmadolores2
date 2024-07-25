@@ -7,6 +7,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView
 
+
 class MainActivity : ReactActivity() {
   override fun getMainComponentName(): String = "farmadolores"
 

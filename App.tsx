@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
@@ -24,13 +17,13 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import Home  from './src/pages/Home';
-import { NavigationContainer} from '@react-navigation/native';
+import Home from './src/pages/Home';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './src/components/BottomTabs';
 import AppNavigator from './src/pages/AppNavigator';
 import { AuthContextProvider } from './src/context/AuthContext';
-
+import codePush from 'react-native-code-push';
 
 export type RootStackParamList = {
   Farmacias: undefined;
@@ -40,8 +33,9 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator();
 
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_START };
 
-function App({...rest}): React.JSX.Element {
+const App: React.FC = ({...rest}): React.JSX.Element => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -53,13 +47,11 @@ function App({...rest}): React.JSX.Element {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
-        />
-      
-     <AppNavigator />
-        </AuthContextProvider>
-      
+      />
+      <AppNavigator />
+    </AuthContextProvider>
   );
 }
 
-
-export default App;
+export default codePush(codePushOptions)(App);
+  
