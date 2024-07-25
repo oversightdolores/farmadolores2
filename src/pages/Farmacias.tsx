@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator, FlatList, Button } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, FlatList, Text, Button } from 'react-native';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import FarmaciaCard from '../components/FarmaciaCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
 
@@ -33,6 +33,7 @@ const formatTime = (timestamp: FirebaseFirestoreTypes.Timestamp | string): strin
 const Farmacias: React.FC = () => {
   const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFarmacias = async () => {
@@ -54,6 +55,7 @@ const Farmacias: React.FC = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching farmacias: ", error);
+        setError("Hubo un problema al cargar los datos. Por favor, inténtalo de nuevo.");
         setLoading(false);
       }
     };
@@ -62,7 +64,29 @@ const Farmacias: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>Cargando...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <Button title="Reintentar" onPress={() => setError(null)} />
+      </View>
+    );
+  }
+
+  if (farmacias.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No hay farmacias disponibles en este momento.</Text>
+      </View>
+    );
   }
 
   return (
@@ -72,8 +96,6 @@ const Farmacias: React.FC = () => {
         renderItem={({ item }) => <FarmaciaCard item={item} onPress={() => {}} />}
         keyExtractor={item => item.id}
       />
-     
-     
     </View>
   );
 };
@@ -85,5 +107,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
     padding: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
   },
 });

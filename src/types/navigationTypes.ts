@@ -1,3 +1,17 @@
+type Farmacia = {
+  id: string;
+  name: string;
+  dir: string;
+  tel: string;
+  horarioAperturaMañana: string;
+  horarioCierreMañana: string;
+  horarioAperturaTarde: string;
+  horarioCierreTarde: string;
+  image: string;
+  detail: string;
+  turn: [];
+};
+
 export type RootStackParamList = {
   Home: undefined;
   Farmacias: undefined;
@@ -21,6 +35,10 @@ export type RootStackParamList = {
   Profile: undefined;
   Turno: undefined;
   Settings: undefined;
+  Welcome: undefined;
+  Onboarding: undefined;
+  App: undefined;
+  Auth: undefined;
   
 
   };

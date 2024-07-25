@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 const Login: React.FC = () => {
   const navigation = useNavigation();
@@ -12,14 +12,14 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Validation Error', 'Both email and password are required.');
+      Alert.alert('Error de validación', 'El email y la contraseña son obligatorios.');
       return;
     }
     try {
       await login(email, password);
     } catch (error) {
-      console.error('Error logging in: ', error);
-      Alert.alert('Login Error', error.message);
+      console.error('Error iniciando sesión: ', error);
+      Alert.alert('Error de inicio de sesión', error.message);
     }
   };
 
@@ -31,14 +31,15 @@ const Login: React.FC = () => {
     try {
       await loginWithGoogle();
     } catch (error) {
-      console.error('Error logging in with Google: ', error);
-      Alert.alert('Google Login Error', error.message);
+      console.error('Error iniciando sesión con Google: ', error);
+      Alert.alert('Error de inicio de sesión con Google', error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Text style={styles.title}>Bienvenido</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -49,7 +50,7 @@ const Login: React.FC = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -60,14 +61,14 @@ const Login: React.FC = () => {
       ) : (
         <>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>Iniciar sesión</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleLogin}>
             <Icon name="google" size={20} color="#fff" style={styles.googleIcon} />
-            <Text style={styles.buttonText}>Login with Google</Text>
+            <Text style={styles.buttonText}>Iniciar sesión con Google</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
-            <Text style={[styles.buttonText, styles.registerButtonText]}>Register</Text>
+            <Text style={[styles.buttonText, styles.registerButtonText]}>Registrarse</Text>
           </TouchableOpacity>
         </>
       )}
@@ -85,11 +86,16 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+  logo: {
+    width: 100,
+    height: 100,
     marginBottom: 30,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 20,
   },
   input: {
     width: '100%',
@@ -97,7 +103,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 15,
     backgroundColor: '#fff',
     fontSize: 16,
     color: '#333',
@@ -113,8 +119,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
   },
   googleButton: {
     backgroundColor: '#db4437',
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
   registerButton: {
     backgroundColor: 'transparent',
     borderColor: '#007bff',
-    borderWidth: 2,
+    borderWidth: 1,
   },
   registerButtonText: {
     color: '#007bff',
