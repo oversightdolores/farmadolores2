@@ -1,10 +1,13 @@
+// components/Turno.tsx
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { DateTime } from 'luxon';
-import notifee, { TriggerType, TimestampTrigger, AndroidImportance } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TurnoCard from './TurnoCard';
+import { showNotification } from '../services/notificationService';
+import { createNotificationChannels } from '../constants/notificationChannels';
+import { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
 type Farmacia = {
   id: string;
@@ -44,6 +47,8 @@ const Turno: React.FC = () => {
 
   useEffect(() => {
     const fetchFarmacias = async () => {
+      await createNotificationChannels(); // Asegúrate de crear los canales
+
       const snapshot = await firestore().collection('farmacias').get();
       const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
       const turnStartBase = DateTime.local().set({
@@ -82,11 +87,8 @@ const Turno: React.FC = () => {
 
       if (matchingPharmacy) {
         setFarmaciaDeTurno(matchingPharmacy);
-        const notificationState = await AsyncStorage.getItem(`notification_${matchingPharmacy.id}`);
-        if (!notificationState) {
-          await scheduleNotifications(matchingPharmacy);
-          await AsyncStorage.setItem(`notification_${matchingPharmacy.id}`, 'scheduled');
-        }
+        await scheduleNotifications(matchingPharmacy);
+        
       } else {
         setFarmaciaDeTurno(null);
       }
@@ -96,31 +98,32 @@ const Turno: React.FC = () => {
 
     fetchFarmacias();
   }, []);
-
+  
   const scheduleNotifications = async (farmacia: FarmaciaConTiempos) => {
     const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-
+    console.log('Now:', now.toISO());
+    
     const notifications = [
       {
         hour: 8,
         minute: 35,
-        title: 'Cambio de Turno',
+        title: 'De turno hoy',
         body: `La farmacia de turno es ${farmacia.name}`,
       },
       {
         hour: 12,
         minute: 0,
         title: 'Recordatorio de Turno',
-        body: `La farmacia de turno sigue siendo ${farmacia.name}`,
+        body: `La farmacia de turno es ${farmacia.name}`,
       },
       {
         hour: 20,
-        minute: 0,
+        minute: 11,
         title: 'Recordatorio de Turno',
-        body: `La farmacia de turno sigue siendo ${farmacia.name}`,
+        body: `La farmacia de turno es ${farmacia.name}`,
       },
     ];
-
+    
     for (const { hour, minute, title, body } of notifications) {
       const notificationTime = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
         hour,
@@ -128,45 +131,23 @@ const Turno: React.FC = () => {
         second: 0,
         millisecond: 0,
       });
-
+      console.log('Notification Time:', notificationTime.toISO());
+      
       if (notificationTime > now) {
         const trigger: TimestampTrigger = {
           type: TriggerType.TIMESTAMP,
           timestamp: notificationTime.toMillis(),
         };
-
-        await notifee.createTriggerNotification(
-          {
-            title,
-            body,
-            android: {
-              channelId: 'default',
-              importance: AndroidImportance.HIGH,
-              sound: 'default',
-              actions: [
-                {
-                  title: 'Ver Farmacia',
-                  pressAction: {
-                    id: 'viewFarmacia',
-                    launchActivity: 'default',
-                  },
-                },
-              ],
-              pressAction: {
-                id: 'default',
-                launchActivity: 'default',
-              },
-            },
-            data: { name: farmacia.name, dir: farmacia.dir, image: farmacia.image, detail: farmacia.detail },
-          },
-          trigger
-        );
+  
+        await showNotification(title, body, { name: farmacia.name, dir: farmacia.dir, image: farmacia.image, detail: farmacia.detail }, trigger);
       }
     }
   };
+  
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
+    
   }
 
   return (

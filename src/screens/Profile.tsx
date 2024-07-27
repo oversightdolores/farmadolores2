@@ -1,13 +1,14 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, DrawerLayoutAndroid } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, DrawerLayoutAndroid, StatusBar } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../context/ThemeContext';
 import SettingsScreen from './SettingsScreen';
+import { RootStackParamList } from '../types/navigationTypes';
 
 const Profile: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout, loading } = useAuth();
   const { toggleTheme } = useTheme();
   const { theme } = useTheme();
@@ -33,6 +34,10 @@ const Profile: React.FC = () => {
         </View>
       )}
     >
+      <StatusBar 
+        backgroundColor={colors.background}
+        barStyle={theme.dark ? 'light-content' : 'dark-content'}
+      />
         <View style={[styles.header, {backgroundColor: colors.background}]}>
           <Text style={[styles.headerTitle, {color: colors.text}]}>Profile</Text>
           <TouchableOpacity onPress={() => drawerRef.current?.openDrawer()}>
@@ -45,21 +50,21 @@ const Profile: React.FC = () => {
             style={styles.profileImage}
             source={{ uri: user?.photoURL || 'https://via.placeholder.com/150' }}
           />
-          <Text style={styles.name}>{user?.displayName || 'User Name'}</Text>
-          <Text style={styles.email}>{user?.email || 'user@example.com'}</Text>
-          <Text style={styles.bio}>
+          <Text style={[styles.name, {color: colors.text}]}>{user?.displayName || 'User Name'}</Text>
+          <Text style={[styles.email, {color: colors.text}]}>{user?.email || 'user@example.com'}</Text>
+          <Text style={[styles.bio, {color: colors.text}]}>
             This is the bio of the user. It can be a few lines long and give a brief description about the user.
           </Text>
         </View>
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
+          {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
             <Icon name="settings" size={20} color="#333" />
             <Text style={styles.buttonText}>Settings</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={toggleTheme}>
             <Icon name="brightness-6" size={20} color="#333" />
             <Text style={styles.buttonText}>Toggle Theme</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           {loading ? (
             <ActivityIndicator size="large" color="#007bff" />
           ) : (
@@ -105,6 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderColor: '#007bff',
     borderWidth: 2,
+    backgroundColor: '#fff',
   },
   name: {
     fontSize: 28,

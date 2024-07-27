@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Para Material Design
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Para FontAwesome
-import Emergencias from '../pages/Emergencias';
-import Farmacias from '../pages/Farmacias';
-import Home from '../pages/Home';
-import Perfil from '../pages/Profile';
+import Emergencias from '../screens/Emergencias';
+import Farmacias from '../screens/Farmacias';
+import Home from '../screens/Home';
+import Perfil from '../screens/Profile';
 
 type TabBarIconProps = {
   focused: boolean;
@@ -16,6 +17,9 @@ type TabBarIconProps = {
 const Tab = createBottomTabNavigator();
 
 const BottomTabs: React.FC = () => {
+  const {theme} = useTheme();
+  const { colors } = theme;
+
   useEffect(() => {
     // Aquí puedes colocar las llamadas a las funciones fetch si las necesitas
     // Ejemplo: dispatch(fetchFarmacias());
@@ -53,12 +57,16 @@ const BottomTabs: React.FC = () => {
               break;
           }
 
-          return <IconComponent name={iconName} size={size} color={focused ? 'green' : 'gray'} />;
+          return <IconComponent name={iconName} size={size} color={focused ? colors.iconActive : colors.iconInactive} />;
         },
         tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
-        tabBarInactiveTintColor: 'gray',
-        tabBarActiveTintColor: 'green',
+        tabBarInactiveTintColor: colors.iconInactive,
+        tabBarActiveTintColor: colors.iconActive,
+        tabBarStyle: {
+          backgroundColor: colors.tabBarBackground,
+          borderTopColor: colors.tabBarBorder,
+        },
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />

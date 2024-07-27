@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BottomTabs from './../components/BottomTabs';
+import BottomTabs from '../components/BottomTabs';
 import Home from './Home';
 import Farmacias from './Farmacias';
 import Emergencias from './Emergencias';
@@ -23,6 +23,9 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
+type OnboardingStackProps = {
+  setIsFirstLaunch: React.Dispatch<React.SetStateAction<boolean | null>>;
+};
 // Navigator for Authentication Screens
 const AuthStack = () => {
   return (
@@ -34,7 +37,7 @@ const AuthStack = () => {
 };
 
 // Navigator for Onboarding Screens
-const OnboardingStack = ({ setIsFirstLaunch }) => {
+const OnboardingStack: React.FC<OnboardingStackProps> = ({ setIsFirstLaunch }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Welcome" options={{ headerShown: false }}>

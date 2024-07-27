@@ -17,11 +17,11 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import Home from './src/pages/Home';
+import Home from './src/screens/Home';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './src/components/BottomTabs';
-import AppNavigator from './src/pages/AppNavigator';
+import AppNavigator from './src/screens/AppNavigator';
 import { AuthContextProvider } from './src/context/AuthContext';
 import codePush from 'react-native-code-push';
 

@@ -2,21 +2,24 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes'; // Ajusta la ruta según tu estructura de archivos
+import { useTheme } from '../context/ThemeContext';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
 const DetailScreen = () => {
+  const {theme} = useTheme()
+  const {colors} = theme
   const route = useRoute<DetailScreenRouteProp>();
   const { farmacia } = route.params;
 
   return (
     <View style={styles.container}>
       <Image source={{ uri: farmacia.image }} style={styles.image} />
-      <Text style={styles.title}>{farmacia.name}</Text>
-      <Text style={styles.info}>Dirección: {farmacia.dir}</Text>
-      <Text style={styles.info}>Teléfono: {farmacia.tel}</Text>
-      <Text style={styles.info}>Horario Mañana: {farmacia.horarioAperturaMañana} - {farmacia.horarioCierreMañana}</Text>
-      <Text style={styles.info}>Horario Tarde: {farmacia.horarioAperturaTarde} - {farmacia.horarioCierreTarde}</Text>
+      <Text style={[styles.title, {color: colors.text}]}>{farmacia.name}</Text>
+      <Text style={[styles.info, {color: colors.text}]}>Dirección: {farmacia.dir}</Text>
+      <Text style={[styles.info, {color: colors.text}]}>Teléfono: {farmacia.tel}</Text>
+      <Text style={[styles.info, {color: colors.text}]}>Horario Mañana: {farmacia.horarioAperturaMañana} - {farmacia.horarioCierreMañana}</Text>
+      <Text style={[styles.info, {color: colors.text}]}>Horario Tarde: {farmacia.horarioAperturaTarde} - {farmacia.horarioCierreTarde}</Text>
     </View>
   );
 };
@@ -27,7 +30,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    
   },
   image: {
     width: '100%',

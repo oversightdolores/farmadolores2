@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useTheme } from './ThemeContext';
 
 // Configura Google Sign-In
 GoogleSignin.configure({
@@ -22,6 +23,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const {resetTheme, toggleTheme} = useTheme()
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -108,6 +110,11 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.error('Error logging out: ', error);
       throw error;
     } finally {
+      setUser(null);
+      setIsAuth(false);
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('theme');
+      resetTheme(); // Restablece el tema por defecto
       setLoading(false);
     }
   };
