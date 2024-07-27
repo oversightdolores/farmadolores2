@@ -6,8 +6,6 @@ buildscript {
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.22"
-         gradlePluginVersion = "4.2.2" // Especifica la versión de Gradle plugin
-        googleServicesVersion = "4.3.8" // Especifica la versión de Google Services plugin
     }
     repositories {
         google()

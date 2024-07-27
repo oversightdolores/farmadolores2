@@ -47,6 +47,10 @@ android {
         versionName "1.0"
         resValue "string", "CodePushDeploymentKey", "fVsNTNQQRSWqXINqWVySpuU-tpXrODOYTXwNy"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
