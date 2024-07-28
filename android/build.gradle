@@ -6,11 +6,12 @@ buildscript {
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.22"
+       
     }
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://maven.pkg.github.com/invertase/notifee' }
+      
     }
     dependencies {
         classpath("com.android.tools.build:gradle")
@@ -18,6 +19,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
         classpath 'com.google.gms:google-services:4.4.2'
     }
+  
 }
 
 apply plugin: "com.facebook.react.rootproject"

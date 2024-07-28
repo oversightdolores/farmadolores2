@@ -28,27 +28,38 @@ const CustomButton = ({ flatListRef, flatListIndex, dataLength, x, setIsFirstLau
 
   const requestPermissions = async () => {
     try {
-      // Solicitar permiso de ubicación
-      const locationStatus = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      console.log('Solicitando permisos...');
+      const locationStatus = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      console.log('Estado del permiso de ubicación:', locationStatus);
       if (locationStatus !== RESULTS.GRANTED) {
-        Alert.alert('Permiso denegado', 'No se otorgó el permiso de ubicación');
+        const locationRequestStatus = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+        console.log('Resultado de la solicitud de ubicación:', locationRequestStatus);
+        if (locationRequestStatus !== RESULTS.GRANTED) {
+          Alert.alert('Permiso denegado', 'No se otorgó el permiso de ubicación');
+          return;
+        }
       }
-
-      // Solicitar permiso de notificaciones
-      const notificationStatus = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+  
+      const notificationStatus = await check(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+      console.log('Estado del permiso de notificaciones:', notificationStatus);
       if (notificationStatus !== RESULTS.GRANTED) {
-        Alert.alert('Permiso denegado', 'No se otorgó el permiso de notificaciones');
-      } else {
-        console.log('Notificaciones permitidas');
+        const notificationRequestStatus = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+        console.log('Resultado de la solicitud de notificaciones:', notificationRequestStatus);
+        if (notificationRequestStatus !== RESULTS.GRANTED) {
+          Alert.alert('Permiso denegado', 'No se otorgó el permiso de notificaciones');
+          return;
+        } else {
+          console.log('Notificaciones permitidas');
+        }
       }
-
-      // Actualizar el estado de isFirstLaunch
+  
       setIsFirstLaunch(false);
     } catch (error) {
       console.error('Error solicitando permisos:', error);
     }
   };
-
+  
+  
   const buttonAnimationStyle = useAnimatedStyle(() => {
     return {
       width:

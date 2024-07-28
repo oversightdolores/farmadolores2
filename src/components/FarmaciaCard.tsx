@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { NavigationProp } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import { GeoPoint } from '@react-native-firebase/firestore';
 
 type Farmacia = {
   id: string;
@@ -18,6 +19,7 @@ type Farmacia = {
   image: string;
   detail: string;
   turn: any; // Puede ajustar esto según sea necesario
+  gps: GeoPoint;
 };
 
 type Status = 'Abierto' | 'Cierra Pronto' | 'Cerrado';

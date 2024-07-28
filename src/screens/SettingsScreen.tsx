@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const SettingsScreen: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { colors } = theme;
-  const { logout } = useAuth();
+  const { logout, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -25,10 +25,6 @@ const SettingsScreen: React.FC = () => {
           <Icon name="brightness-6" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Toggle Theme</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-          <Icon name="logout" size={24} color={colors.text} />
-          <Text style={[styles.menuText, { color: colors.text }]}>Logout</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => { /* Navegar a Editar Perfil */ }}>
           <Icon name="edit" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Edit Profile</Text>
@@ -37,6 +33,17 @@ const SettingsScreen: React.FC = () => {
           <Icon name="report-problem" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Report Problem</Text>
         </TouchableOpacity>
+        {loading ? (
+          <View style={styles.menuItem}>
+            <ActivityIndicator size="large" color="#007bff" />
+          </View>
+          ) : (
+        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+          <Icon name="logout" size={24} color={colors.error} />
+          <Text style={[styles.menuText, { color: colors.error }]}>Logout</Text>
+        </TouchableOpacity>
+            
+          )}
       </View>
     </View>
   );
@@ -66,6 +73,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     marginLeft: 20,
-    fontSize: 18,
+    fontSize: 15,
+    color: '#333',
   },
 });

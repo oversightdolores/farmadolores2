@@ -5,5 +5,9 @@
     <string name="appCenterAnalytics_whenToEnableAnalytics" moduleConfig="true" translatable="false">
         ALWAYS_SEND</string>
     <string name="app_name">farmadolores</string>
-    <string moduleConfig="true" name="CodePushDeploymentKey">2e17a735-5d82-4437-93c7-022ea540cf03</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">fVsNTNQQRSWqXINqWVySpuU-tpXrODOYTXwNy</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyA9JvTARfT2vGaG6VyV6zZEzDeYJGjuoDw</string>
+
 </resources>

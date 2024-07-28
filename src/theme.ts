@@ -1,4 +1,3 @@
-// theme.ts
 export const lightTheme = {
   dark: false,
   colors: {
@@ -16,6 +15,9 @@ export const lightTheme = {
     iconInactive: '#999999',      // Gris para iconos inactivos
     tabBarBackground: '#ffffff',  // Blanco para el fondo de la barra de pestañas
     tabBarBorder: '#dbdbdb',      // Gris claro para el borde de la barra de pestañas
+    warning: '#f39c12',           // Amarillo para advertencias
+    error: '#e74c3c',             // Rojo para errores
+    success: '#2ecc71',           // Verde para éxito
   },
 };
 
@@ -36,5 +38,8 @@ export const darkTheme = {
     iconInactive: '#999999',      // Gris para iconos inactivos
     tabBarBackground: '#000000',  // Negro para el fondo de la barra de pestañas
     tabBarBorder: '#333333',      // Gris oscuro para el borde de la barra de pestañas
+    warning: '#f39c12',           // Amarillo para advertencias
+    error: '#e74c3c',             // Rojo para errores
+    success: '#2ecc71',           // Verde para éxito
   },
 };

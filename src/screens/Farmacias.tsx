@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, FlatList, Text, Button } from 'react-native';
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import firestore, { FirebaseFirestoreTypes, GeoPoint } from '@react-native-firebase/firestore';
 import FarmaciaCard from '../components/FarmaciaCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
+import AdBanner from '../components/AdBanner';
 
 type Farmacia = {
   id: string;
@@ -15,6 +16,7 @@ type Farmacia = {
   image: string;
   detail: string;
   turn: FirebaseFirestoreTypes.Timestamp[];
+  gps: GeoPoint;
 };
 
 // Función para verificar si un valor es Timestamp
@@ -90,13 +92,16 @@ const Farmacias: React.FC = () => {
   }
 
   return (
+    <>
+      <AdBanner />
     <View style={styles.container}>
       <FlatList
         data={farmacias}
         renderItem={({ item }) => <FarmaciaCard item={item} onPress={() => {}} />}
         keyExtractor={item => item.id}
-      />
+        />
     </View>
+        </>
   );
 };
 

@@ -4,6 +4,7 @@ import firestore from '@react-native-firebase/firestore';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
+import AdBanner from '../components/AdBanner';
 
 type Emergencia = {
   id: string;
@@ -81,6 +82,8 @@ const Emergencias: React.FC<Props> = () => {
   }
 
   return (
+    <>
+    <AdBanner />
     <View style={styles.container}>
       <FlatList
         data={emergencias}
@@ -88,8 +91,9 @@ const Emergencias: React.FC<Props> = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
-      />
+        />
     </View>
+        </>
   );
 };
 

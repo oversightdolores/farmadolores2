@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../context/ThemeContext';
 import SettingsScreen from './SettingsScreen';
 import { RootStackParamList } from '../types/navigationTypes';
+import AdBanner from '../components/AdBanner';
 
 const Profile: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -65,16 +66,10 @@ const Profile: React.FC = () => {
             <Icon name="brightness-6" size={20} color="#333" />
             <Text style={styles.buttonText}>Toggle Theme</Text>
           </TouchableOpacity> */}
-          {loading ? (
-            <ActivityIndicator size="large" color="#007bff" />
-          ) : (
-            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
-              <Icon name="logout" size={20} color="#fff" />
-              <Text style={[styles.buttonText, styles.logoutButtonText]}>Logout</Text>
-            </TouchableOpacity>
-          )}
+          
         </View>
       </View>
+        <AdBanner/>
     </DrawerLayoutAndroid>
   );
 };
