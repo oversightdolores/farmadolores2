@@ -1,4 +1,3 @@
-// components/Turno.tsx
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -51,12 +50,6 @@ const Turno: React.FC = () => {
 
       const snapshot = await firestore().collection('farmacias').get();
       const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-      const turnStartBase = DateTime.local().set({
-        hour: 8,
-        minute: 35,
-        second: 0,
-        millisecond: 0,
-      });
 
       const farmacias: FarmaciaConTiempos[] = snapshot.docs.map(doc => {
         const data = doc.data() as Farmacia;
@@ -72,12 +65,11 @@ const Turno: React.FC = () => {
 
       const matchingPharmacy = farmacias.find((pharmacy) => {
         return pharmacy.turn.some((t) => {
-          const turnDate = t.toDate();
-          const turnStart = DateTime.fromJSDate(turnDate).set({
-            hour: turnStartBase.hour,
-            minute: turnStartBase.minute,
-            second: turnStartBase.second,
-            millisecond: turnStartBase.millisecond,
+          const turnStart = DateTime.fromJSDate(t.toDate()).set({
+            hour: 8,
+            minute: 35,
+            second: 0,
+            millisecond: 0,
           });
           const turnEnd = turnStart.plus({ hours: 24 });
 
@@ -87,8 +79,7 @@ const Turno: React.FC = () => {
 
       if (matchingPharmacy) {
         setFarmaciaDeTurno(matchingPharmacy);
-        await scheduleNotifications(matchingPharmacy);
-        
+        await scheduleNotifications(matchingPharmacy, now);
       } else {
         setFarmaciaDeTurno(null);
       }
@@ -98,56 +89,50 @@ const Turno: React.FC = () => {
 
     fetchFarmacias();
   }, []);
-  
-  const scheduleNotifications = async (farmacia: FarmaciaConTiempos) => {
-    const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-    console.log('Now:', now.toISO());
-    
+
+  const scheduleNotifications = async (pharmacy: FarmaciaConTiempos, now: DateTime) => {
     const notifications = [
       {
         hour: 8,
         minute: 35,
         title: 'De turno hoy',
-        body: `La farmacia de turno es ${farmacia.name}`,
+        body: `La farmacia de turno es ${pharmacy.name}`,
       },
       {
         hour: 12,
         minute: 0,
         title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${farmacia.name}`,
+        body: `La farmacia de turno es ${pharmacy.name}`,
       },
       {
         hour: 20,
         minute: 11,
         title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${farmacia.name}`,
+        body: `La farmacia de turno es ${pharmacy.name}`,
       },
     ];
-    
+
     for (const { hour, minute, title, body } of notifications) {
-      const notificationTime = DateTime.local().setZone('America/Argentina/Buenos_Aires').set({
+      const notificationTime = now.set({
         hour,
         minute,
         second: 0,
         millisecond: 0,
       });
-      console.log('Notification Time:', notificationTime.toISO());
-      
+
       if (notificationTime > now) {
         const trigger: TimestampTrigger = {
           type: TriggerType.TIMESTAMP,
           timestamp: notificationTime.toMillis(),
         };
-  
-        await showNotification(title, body, { name: farmacia.name, dir: farmacia.dir, image: farmacia.image, detail: farmacia.detail }, trigger);
+
+        await showNotification(title, body, { name: pharmacy.name, dir: pharmacy.dir, image: pharmacy.image, detail: pharmacy.detail }, trigger);
       }
     }
   };
-  
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
-    
   }
 
   return (

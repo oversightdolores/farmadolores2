@@ -9,6 +9,7 @@ import Emergencias from './Emergencias';
 import DetailScreen from './DetailScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
+import PrimerosAuxilios from './PrimeroAuxilios';
 import WelcomeScreen from './WelcomeScreen';
 import { RootStackParamList } from '../types/navigationTypes';
 import { AuthContextProvider, useAuth } from '../context/AuthContext';
@@ -58,6 +59,7 @@ const AppStack = () => {
       <Stack.Screen name="Farmacias" component={Farmacias} options={{ headerShown: false }} />
       <Stack.Screen name="Emergencias" component={Emergencias} options={{ headerShown: false }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
+      <Stack.Screen name="PrimeroAuxilios" component={PrimerosAuxilios} options={{ headerShown: false }} />
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
       <Stack.Screen name="Detail" component={DetailScreen} options={({ route }) => ({ title: route.params.farmacia.name })} />
     </Stack.Navigator>

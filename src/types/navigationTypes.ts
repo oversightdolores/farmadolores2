@@ -44,6 +44,7 @@ export type RootStackParamList = {
   App: undefined;
   Auth: undefined;
   Drawer: undefined;
+  PrimeroAuxilios: undefined;
 
   };
   
