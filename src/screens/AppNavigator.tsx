@@ -20,6 +20,8 @@ import { lightTheme, darkTheme } from '../theme';
 import { useColorScheme } from 'react-native';
 import {  ThemeContextProvider, useTheme } from '../context/ThemeContext';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import Locales from './Locales';
+import LocalDetailScreen from './LocalDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -61,6 +63,8 @@ const AppStack = () => {
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
       <Stack.Screen name="PrimeroAuxilios" component={PrimerosAuxilios} options={{ headerShown: false }} />
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      <Stack.Screen name="Local" component={Locales} options={{ title: 'Locales' }} />
+      <Stack.Screen name="LocalDetail" component={LocalDetailScreen} options={{ title: 'Detalles del Local' }} />
       <Stack.Screen name="Detail" component={DetailScreen} options={({ route }) => ({ title: route.params.farmacia.name })} />
     </Stack.Navigator>
     </>

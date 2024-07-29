@@ -5,6 +5,7 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
 import AdBanner from '../components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type Emergencia = {
   id: string;
@@ -83,7 +84,7 @@ const Emergencias: React.FC<Props> = () => {
 
   return (
     <>
-    <AdBanner />
+    <AdBanner size={BannerAdSize.FULL_BANNER} />
     <View style={styles.container}>
       <FlatList
         data={emergencias}

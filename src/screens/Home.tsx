@@ -7,6 +7,7 @@ import AdBanner from '../components/AdBanner';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes'; // Asegúrate de que la ruta sea correcta
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -18,10 +19,13 @@ const Home = () => {
   const handlePress = () => {
     navigation.navigate('PrimeroAuxilios'); // Asegúrate de que 'PrimerosAuxilios' sea el nombre correcto de tu pantalla en la navegación
   };
+  const localesPress = () => {
+    navigation.navigate('Local'); // Asegúrate de que 'Locales' sea el nombre correcto de tu pantalla en la navegación
+  };
 
   return (
     <>
-      <AdBanner />
+      <AdBanner size={BannerAdSize.FULL_BANNER} />
       <StatusBar
         backgroundColor={colors.background}
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
@@ -35,6 +39,14 @@ const Home = () => {
         >
           <Text style={[styles.buttonText, { color: colors.text }]}>
             Ver Primeros Auxilios
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
+          onPress={localesPress}
+        >
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            Ver Locales
           </Text>
         </TouchableOpacity>
       </View>

@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import MapView, { Marker } from 'react-native-maps';
 import { GeoPoint } from 'firebase/firestore';
 import AdBanner from '../components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -50,7 +51,7 @@ const DetailScreen = () => {
         </MapView>
       </View>
     </ScrollView>
-          <AdBanner />
+    <AdBanner size={BannerAdSize.FULL_BANNER} />
           </>
   );
 };

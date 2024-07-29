@@ -1,6 +1,6 @@
 import { GeoPoint } from 'firebase/firestore';
 
-type Farmacia = {
+export type Farmacia = {
   id: string;
   name: string;
   dir: string;
@@ -12,9 +12,18 @@ type Farmacia = {
   image: string;
   detail: string;
   turn: [];
-  gps: GeoPoint; // Cambiado de string a GeoPoint
+  gps: GeoPoint;
 };
 
+export type Local = {
+  id: string;
+  name: string;
+  descrip: string;
+  direccion: string;
+  image: string;
+  tel: string;
+  url: string;
+};
 
 export type RootStackParamList = {
   Home: undefined;
@@ -45,6 +54,6 @@ export type RootStackParamList = {
   Auth: undefined;
   Drawer: undefined;
   PrimeroAuxilios: undefined;
-
-  };
-  
+  Local: undefined;
+  LocalDetail: { local: Local };
+};

@@ -3,6 +3,7 @@ import { StyleSheet, View, ActivityIndicator, FlatList, Text, Button } from 'rea
 import firestore, { FirebaseFirestoreTypes, GeoPoint } from '@react-native-firebase/firestore';
 import FarmaciaCard from '../components/FarmaciaCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
 import AdBanner from '../components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type Farmacia = {
   id: string;
@@ -93,7 +94,7 @@ const Farmacias: React.FC = () => {
 
   return (
     <>
-      <AdBanner />
+      <AdBanner size={BannerAdSize.FULL_BANNER} />
     <View style={styles.container}>
       <FlatList
         data={farmacias}

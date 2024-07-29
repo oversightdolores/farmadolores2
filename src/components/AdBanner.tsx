@@ -1,13 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { View, StyleSheet } from 'react-native';
+import { BannerAd, BannerAdSize, BannerAdProps } from 'react-native-google-mobile-ads';
 
-const AdBanner = () => {
+interface AdBannerProps {
+  size: BannerAdProps['size'];
+}
+
+const AdBanner: React.FC<AdBannerProps> = ({ size }) => {
   return (
     <View style={styles.bannerContainer}>
       <BannerAd
         unitId="ca-app-pub-1460570234418559/3397663182"
-        size={BannerAdSize.BANNER}
+        size={size}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,
         }}

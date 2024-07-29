@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import SettingsScreen from './SettingsScreen';
 import { RootStackParamList } from '../types/navigationTypes';
 import AdBanner from '../components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 const Profile: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -69,7 +70,7 @@ const Profile: React.FC = () => {
           
         </View>
       </View>
-        <AdBanner/>
+      <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
     </DrawerLayoutAndroid>
   );
 };
