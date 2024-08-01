@@ -8,10 +8,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes'; // Asegúrate de que la ruta sea correcta
 import { BannerAdSize } from 'react-native-google-mobile-ads';
+import SkeletonCard from '../skeleton/SkeletonCard';
+import { usePharmacies } from '../context/PharmacyContext';
+
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 const Home = () => {
+ const { loading } = usePharmacies();
   const { theme } = useTheme();
   const { colors } = theme;
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -22,6 +26,7 @@ const Home = () => {
   const localesPress = () => {
     navigation.navigate('Local'); // Asegúrate de que 'Locales' sea el nombre correcto de tu pantalla en la navegación
   };
+ 
 
   return (
     <>
@@ -30,8 +35,14 @@ const Home = () => {
         backgroundColor={colors.background}
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
       />
+    { loading ? (
+      <SkeletonCard />
+    ) : (
+        <>
       <Turno />
 
+        </>
+      )}
       <View style={styles.container}>
       <TouchableOpacity
           style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
@@ -50,10 +61,10 @@ const Home = () => {
           </Text>
         </TouchableOpacity>
       </View>
+      <AdScreen /> 
+      </>
 
-      <AdScreen />
-    </>
-  );
+);
 };
 
 export default Home;

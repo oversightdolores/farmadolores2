@@ -25,6 +25,17 @@ export type Local = {
   url: string;
 };
 
+
+export type Emergencia = {
+  id: string;
+  name: string;
+  dir: string;
+  tel: string;
+  image: string;
+  detail: string;
+  gps: GeoPoint;
+};
+
 export type RootStackParamList = {
   Home: undefined;
   Farmacias: undefined;
@@ -42,6 +53,7 @@ export type RootStackParamList = {
   };
   BottomTabs: undefined;
   Detail: { farmacia: Farmacia };
+  DetailE: { emergencia: Emergencia};
   Permission: undefined;
   Login: undefined;
   Register: undefined;

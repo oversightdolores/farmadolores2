@@ -22,6 +22,8 @@ import {  ThemeContextProvider, useTheme } from '../context/ThemeContext';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Locales from './Locales';
 import LocalDetailScreen from './LocalDetailScreen';
+import DetailE from './DetailE';
+import { PharmacyProvider } from '../context/PharmacyContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -66,6 +68,7 @@ const AppStack = () => {
       <Stack.Screen name="Local" component={Locales} options={{ title: 'Locales' }} />
       <Stack.Screen name="LocalDetail" component={LocalDetailScreen} options={{ title: 'Detalles del Local' }} />
       <Stack.Screen name="Detail" component={DetailScreen} options={({ route }) => ({ title: route.params.farmacia.name })} />
+      <Stack.Screen name="DetailE" component={DetailE} options={({ route }) => ({ title: route.params.emergencia.name })} />
     </Stack.Navigator>
     </>
   );
@@ -118,7 +121,9 @@ const AppNavigator: React.FC = ({ ...rest }) => {
 export default () => (
   <AuthContextProvider>
     <ThemeContextProvider>
+      <PharmacyProvider>
     <AppNavigator />
+      </PharmacyProvider>
     </ThemeContextProvider>
   </AuthContextProvider>
 );

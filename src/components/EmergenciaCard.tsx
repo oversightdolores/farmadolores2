@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { GeoPoint } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 
 type Emergencia = {
   id: string;
-  nombre: string;
-  direccion: string;
-  telefono: string;
-  imagen: string;
-  descripcion: string;
+  name: string;
+  dir: string;
+  tel: string;
+  image: string;
+  detail: string;
+  gps: GeoPoint;
 };
 
 type EmergenciaCardProps = {
@@ -23,17 +24,16 @@ const EmergenciaCard: React.FC<EmergenciaCardProps> = ({ item, onPress }) => {
   const navigation = useNavigation<NavigationProp<any>>();
   const { theme } = useTheme();
   const { colors } = theme;
-  const { nombre, direccion, telefono, imagen, descripcion } = item;
+  const { name, dir, tel, image, detail } = item;
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate('Detail', { emergencia: item })}>
+    <TouchableOpacity onPress={() => navigation.navigate('DetailE', { emergencia: item })}>
       <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Image source={{ uri: imagen }} style={styles.image} />
+        <Image source={{ uri: detail }} style={styles.image} />
         <View style={styles.infoContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>{nombre}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Dirección: {direccion}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {telefono}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Descripción: {descripcion}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
         </View>
       </View>
     </TouchableOpacity>

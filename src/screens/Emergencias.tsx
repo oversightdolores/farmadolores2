@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, FlatList, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { GeoPoint } from '@react-native-firebase/firestore';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
 import AdBanner from '../components/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
-
+import EmergenciaCard from '../components/EmergenciaCard';
 type Emergencia = {
   id: string;
   name: string;
@@ -14,36 +14,15 @@ type Emergencia = {
   tel: string;
   image: string;
   detail: string;
+  gps: GeoPoint;
 };
 
-type EmergenciaCardProps = {
-  item: Emergencia;
-  onPress: (item: Emergencia) => void;
-};
+
 
 type EmergenciasNavigationProp = NavigationProp<RootStackParamList, 'Emergencias'>;
 
 type Props = {
   navigation: EmergenciasNavigationProp;
-};
-
-const EmergenciaCard: React.FC<EmergenciaCardProps> = ({ item, onPress }) => {
-  const { name, dir, tel, image, detail } = item;
-  const { theme } = useTheme();
-  const { colors } = theme;
-
-  return (
-    <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={[styles.card, {backgroundColor: colors.card}  ]}>
-        <Image source={{ uri: detail }} style={styles.image} />
-        <View style={styles.infoContainer}>
-          <Text style={[styles.title, {color: colors.text}]}>{name}</Text>
-          <Text style={[styles.info, {color: colors.text}]}>Dirección: {dir}</Text>
-          <Text style={[styles.info, {color: colors.text}]}>Teléfono: {tel}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
 };
 
 const Emergencias: React.FC<Props> = () => {
@@ -62,6 +41,7 @@ const Emergencias: React.FC<Props> = () => {
           tel: data.tel || '',
           image: data.image || '',
           detail: data.detail || '',
+          gps: data.gps || '',
         };
       });
 

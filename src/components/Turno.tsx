@@ -1,144 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { DateTime } from 'luxon';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { usePharmacies } from '../context/PharmacyContext';
 import TurnoCard from './TurnoCard';
-import { showNotification } from '../services/notificationService';
-import { createNotificationChannels } from '../constants/notificationChannels';
-import { TimestampTrigger, TriggerType } from '@notifee/react-native';
-
-type Farmacia = {
-  id: string;
-  name: string;
-  dir: string;
-  tel: string;
-  horarioAperturaMañana?: FirebaseFirestoreTypes.Timestamp | string;
-  horarioCierreMañana?: FirebaseFirestoreTypes.Timestamp | string;
-  horarioAperturaTarde?: FirebaseFirestoreTypes.Timestamp | string;
-  horarioCierreTarde?: FirebaseFirestoreTypes.Timestamp | string;
-  image: string;
-  detail: string;
-  turn: FirebaseFirestoreTypes.Timestamp[];
-};
-
-type FarmaciaConTiempos = {
-  id: string;
-  name: string;
-  dir: string;
-  tel: string;
-  horarioAperturaMañana?: string;
-  horarioCierreMañana?: string;
-  horarioAperturaTarde?: string;
-  horarioCierreTarde?: string;
-  image: string;
-  detail: string;
-  turn: FirebaseFirestoreTypes.Timestamp[];
-};
+import SkeletonCard from '../skeleton/SkeletonCard';
+import { DateTime } from 'luxon';
 
 const Turno: React.FC = () => {
-  const [farmaciaDeTurno, setFarmaciaDeTurno] = useState<FarmaciaConTiempos | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { farmacias, loading } = usePharmacies();
 
-  const isTimestamp = (value: any): value is FirebaseFirestoreTypes.Timestamp => {
-    return value instanceof firestore.Timestamp;
-  };
-
-  useEffect(() => {
-    const fetchFarmacias = async () => {
-      await createNotificationChannels(); // Asegúrate de crear los canales
-
-      const snapshot = await firestore().collection('farmacias').get();
-      const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-
-      const farmacias: FarmaciaConTiempos[] = snapshot.docs.map(doc => {
-        const data = doc.data() as Farmacia;
-        return {
-          ...data,
-          id: doc.id,
-          horarioAperturaMañana: isTimestamp(data.horarioAperturaMañana) ? data.horarioAperturaMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : data.horarioAperturaMañana,
-          horarioCierreMañana: isTimestamp(data.horarioCierreMañana) ? data.horarioCierreMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : data.horarioCierreMañana,
-          horarioAperturaTarde: isTimestamp(data.horarioAperturaTarde) ? data.horarioAperturaTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : data.horarioAperturaTarde,
-          horarioCierreTarde: isTimestamp(data.horarioCierreTarde) ? data.horarioCierreTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : data.horarioCierreTarde,
-        };
-      });
-
-      const matchingPharmacy = farmacias.find((pharmacy) => {
-        return pharmacy.turn.some((t) => {
-          const turnStart = DateTime.fromJSDate(t.toDate()).set({
-            hour: 8,
-            minute: 35,
-            second: 0,
-            millisecond: 0,
-          });
-          const turnEnd = turnStart.plus({ hours: 24 });
-
-          return now >= turnStart && now <= turnEnd;
-        });
-      });
-
-      if (matchingPharmacy) {
-        setFarmaciaDeTurno(matchingPharmacy);
-        await scheduleNotifications(matchingPharmacy, now);
-      } else {
-        setFarmaciaDeTurno(null);
-      }
-
-      setLoading(false);
-    };
-
-    fetchFarmacias();
-  }, []);
-
-  const scheduleNotifications = async (pharmacy: FarmaciaConTiempos, now: DateTime) => {
-    const notifications = [
-      {
+  const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
+  const matchingPharmacy = farmacias.find((pharmacy) => {
+    return pharmacy.turn.some((t) => {
+      const turnStart = DateTime.fromJSDate(t.toDate()).set({
         hour: 8,
         minute: 35,
-        title: 'De turno hoy',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-      {
-        hour: 12,
-        minute: 0,
-        title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-      {
-        hour: 20,
-        minute: 11,
-        title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-    ];
-
-    for (const { hour, minute, title, body } of notifications) {
-      const notificationTime = now.set({
-        hour,
-        minute,
         second: 0,
         millisecond: 0,
       });
+      const turnEnd = turnStart.plus({ hours: 24 });
 
-      if (notificationTime > now) {
-        const trigger: TimestampTrigger = {
-          type: TriggerType.TIMESTAMP,
-          timestamp: notificationTime.toMillis(),
-        };
+      return now >= turnStart && now <= turnEnd;
+    });
+  });
 
-        await showNotification(title, body, { name: pharmacy.name, dir: pharmacy.dir, image: pharmacy.image, detail: pharmacy.detail }, trigger);
-      }
-    }
-  };
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
+  
 
   return (
     <View style={styles.container}>
-      {farmaciaDeTurno ? (
-        <TurnoCard item={farmaciaDeTurno} onPress={(item) => { }} />
+      {matchingPharmacy ? (
+        <TurnoCard item={matchingPharmacy} onPress={(item) => { }} />
       ) : (
         <View style={styles.noTurnos}>
           <Text style={styles.noTurnosText}>No hay farmacias de turno en este momento</Text>

@@ -1,85 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator, FlatList, Text, Button } from 'react-native';
-import firestore, { FirebaseFirestoreTypes, GeoPoint } from '@react-native-firebase/firestore';
+import React from 'react';
+import { StyleSheet, View, FlatList, Text, Button } from 'react-native';
 import FarmaciaCard from '../components/FarmaciaCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
 import AdBanner from '../components/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
-
-type Farmacia = {
-  id: string;
-  name: string;
-  dir: string;
-  tel: string;
-  horarioAperturaMañana: string;
-  horarioCierreMañana: string;
-  horarioAperturaTarde: string;
-  horarioCierreTarde: string;
-  image: string;
-  detail: string;
-  turn: FirebaseFirestoreTypes.Timestamp[];
-  gps: GeoPoint;
-};
-
-// Función para verificar si un valor es Timestamp
-const isTimestamp = (value: any): value is FirebaseFirestoreTypes.Timestamp => {
-  return value instanceof firestore.Timestamp;
-};
-
-// Función para formatear el tiempo
-const formatTime = (timestamp: FirebaseFirestoreTypes.Timestamp | string): string => {
-  if (isTimestamp(timestamp)) {
-    return timestamp.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-  }
-  return timestamp;
-};
+import SkeletonCard from '../skeleton/SkeletonCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
+import { usePharmacies } from '../context/PharmacyContext';
 
 const Farmacias: React.FC = () => {
-  const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchFarmacias = async () => {
-      try {
-        const snapshot = await firestore().collection('farmacias').get();
-        const fetchedFarmacias: Farmacia[] = snapshot.docs.map(doc => {
-          const data = doc.data() as Omit<Farmacia, 'id'> & { turn: FirebaseFirestoreTypes.Timestamp[] };
-          return {
-            ...data,
-            id: doc.id,
-            horarioAperturaMañana: formatTime(data.horarioAperturaMañana),
-            horarioCierreMañana: formatTime(data.horarioCierreMañana),
-            horarioAperturaTarde: formatTime(data.horarioAperturaTarde),
-            horarioCierreTarde: formatTime(data.horarioCierreTarde),
-          };
-        });
-
-        setFarmacias(fetchedFarmacias);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching farmacias: ", error);
-        setError("Hubo un problema al cargar los datos. Por favor, inténtalo de nuevo.");
-        setLoading(false);
-      }
-    };
-
-    fetchFarmacias();
-  }, []);
+  const { farmacias, loading } = usePharmacies();
 
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Cargando...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <Button title="Reintentar" onPress={() => setError(null)} />
+        <FlatList
+          data={Array(5).fill({})} // Array de 5 elementos vacíos para mostrar los SkeletonCard
+          renderItem={() => <SkeletonCard />}
+          keyExtractor={(_, index) => index.toString()}
+        />
       </View>
     );
   }
@@ -95,14 +32,14 @@ const Farmacias: React.FC = () => {
   return (
     <>
       <AdBanner size={BannerAdSize.FULL_BANNER} />
-    <View style={styles.container}>
-      <FlatList
-        data={farmacias}
-        renderItem={({ item }) => <FarmaciaCard item={item} onPress={() => {}} />}
-        keyExtractor={item => item.id}
+      <View style={styles.container}>
+        <FlatList
+          data={farmacias}
+          renderItem={({ item }) => <FarmaciaCard item={item} onPress={() => {}} />}
+          keyExtractor={item => item.id}
         />
-    </View>
-        </>
+      </View>
+    </>
   );
 };
 
@@ -111,27 +48,12 @@ export default Farmacias;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
-    padding: 20,
+    padding: 10,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-    fontSize: 16,
   },
   emptyContainer: {
     flex: 1,
