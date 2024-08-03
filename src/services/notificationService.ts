@@ -26,6 +26,7 @@ export const showNotification = async (title: string, body: string, data: any, t
           id: 'default',
           launchActivity: 'default',
         },
+        timestamp: Date.now() + 5 * 1000,
       },
       data,
     },

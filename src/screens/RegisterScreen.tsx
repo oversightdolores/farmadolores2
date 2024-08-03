@@ -2,34 +2,50 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
+import Icon from 'react-native-vector-icons/AntDesign';
+
+
+
 
 const RegisterScreen: React.FC = () => {
   const navigation = useNavigation();
-
+  const {theme} = useTheme();
+  const colors = theme.colors;
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const { register, loading } = useAuth();
+  const { register, loading, loginWithGoogle } = useAuth();
 
   const handleRegister = async () => {
     if (!email || !password) {
-      Alert.alert('Validation Error', 'Both email and password are required.');
+      Alert.alert('Campos Vacios', 'Email y contraseña son requeridos.');
       return;
     }
     try {
       await register(email, password);
-      navigation.replace('Profile'); // Navegar a la pantalla de perfil después del registro exitoso
+      navigation.navigate('Home'); 
     } catch (e) {
       setError((e as Error).message);
       Alert.alert('Registration Error', (e as Error).message);
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error('Error iniciando sesión con Google: ', error);
+      Alert.alert('Error de inicio de sesión con Google', error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Registrate</Text>
       <TextInput
-        style={styles.input}
+                style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -37,7 +53,8 @@ const RegisterScreen: React.FC = () => {
         placeholderTextColor="#999"
       />
       <TextInput
-        style={styles.input}
+               style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
@@ -45,12 +62,20 @@ const RegisterScreen: React.FC = () => {
         placeholderTextColor="#999"
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {loading ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+     
+        <TouchableOpacity style={[styles.button,  styles.registerButton, {backgroundColor: colors.background, borderColor: colors.primary}]} onPress={handleRegister}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
+        {loading ? (
+        <ActivityIndicator size="large" color={colors.notification} />
+      ) : (
+        <>
+          
+          <TouchableOpacity style={[styles.button, styles.googleButton, { backgroundColor: '#db4437' }]} onPress={handleGoogleLogin}>
+            <Icon name="google" size={20} color="#fff" style={styles.googleIcon} />
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Iniciar sesión con Google</Text>
+          </TouchableOpacity>
+        </>
       )}
     </View>
   );
@@ -70,35 +95,46 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 30,
   },
-  input: { 
-    width: '100%', 
-    padding: 15, 
-    borderColor: '#ddd', 
-    borderWidth: 1, 
-    borderRadius: 8, 
-    marginBottom: 20, 
-    backgroundColor: '#fff', 
-    fontSize: 16, 
-    color: '#333',
+  input: {
+    width: '100%',
+    padding: 15,
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+    elevation: 3,
   },
   button: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#007bff',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
+    elevation: 3,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  googleButton: {
+    flexDirection: 'row',
+    elevation: 3,
+  },
+  googleIcon: {
+    marginRight: 10,
   },
   error: { 
     color: 'red', 
     marginBottom: 12 
   },
+  registerButton: {
+    borderWidth: 1,
+  },
+  registerButtonText: {
+    color: '#007bff',
+  },
+  
 });
 
 export default RegisterScreen;

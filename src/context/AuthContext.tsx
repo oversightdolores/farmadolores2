@@ -73,7 +73,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const register = async (email: string, password: string) => {
     if (!email || !password) {
-      throw new Error('Both email and password are required.');
+      throw new Error('Email y contraseña son requeridos.');
     }
     setLoading(true);
     try {

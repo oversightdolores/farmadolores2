@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, FlatList } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import AdBanner from '../components/ads/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type GuideItem = {
   id: string;
@@ -149,20 +151,24 @@ const PrimerosAuxilios = () => {
   );
 
   return (
+    <>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.header, { color: colors.text }]}>Guías de Primeros Auxilios</Text>
       <FlatList
         data={guides}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <RenderItem item={item} />}
-      />
+        />
     </View>
+    <AdBanner size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+        </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
+    flex: 1,
   },
   header: {
     fontSize: 24,
@@ -170,14 +176,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    borderRadius: 10,
+    borderRadius: 5,
     padding: 15,
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    elevation: 3,
+   
   },
   title: {
     fontSize: 18,

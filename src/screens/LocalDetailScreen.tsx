@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, Button, Linking } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type LocalDetailScreenRouteProp = RouteProp<RootStackParamList, 'LocalDetail'>;

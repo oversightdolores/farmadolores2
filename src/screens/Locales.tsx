@@ -5,10 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList, Local } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type LocalesListScreenNavigationProp = NavigationProp<RootStackParamList, 'LocalDetail'>;
+
 
 const LocalesListScreen: React.FC = () => {
   const [locales, setLocales] = useState<Local[]>([]);
@@ -18,17 +19,24 @@ const LocalesListScreen: React.FC = () => {
   const { colors } = theme;
 
   useEffect(() => {
-    const fetchLocales = async () => {
-      const snapshot = await firestore().collection('publi').get();
-      const fetchedLocales: Local[] = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      } as Local));
-      setLocales(fetchedLocales);
+    const snapshot = firestore().collection('publi').onSnapshot((querySnapshot) => {
+      const localesData: Local[] = querySnapshot.docs.map((doc) => {
+        const data = doc.data() as Local;
+        return {
+          id: doc.id,
+          name: data.name || '',
+          descrip: data.descrip || '',
+          image: data.image,
+          direccion: data.direccion || '',
+          tel: data.tel || '',
+          url: data.url || '',
+        };
+      });
+      setLocales(localesData);
       setLoading(false);
-    };
+    })
 
-    fetchLocales();
+    return () => snapshot();
   }, []);
 
   const renderItem = ({ item }: { item: Local }) => (
@@ -53,7 +61,7 @@ const LocalesListScreen: React.FC = () => {
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.container}
       />
-       <AdBanner size={BannerAdSize.FULL_BANNER} />
+       <AdBanner size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
       </>
   );
 };

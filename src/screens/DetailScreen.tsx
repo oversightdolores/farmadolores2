@@ -5,7 +5,7 @@ import { RootStackParamList } from '../types/navigationTypes'; // Ajusta la ruta
 import { useTheme } from '../context/ThemeContext';
 import MapView, { Marker } from 'react-native-maps';
 import { GeoPoint } from 'firebase/firestore';
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;

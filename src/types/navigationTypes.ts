@@ -1,3 +1,4 @@
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { GeoPoint } from 'firebase/firestore';
 
 export type Farmacia = {
@@ -14,14 +15,27 @@ export type Farmacia = {
   turn: [];
   gps: GeoPoint;
 };
+export type FarmaciaConTiempos = {
+  id: string;
+  name: string;
+  dir: string;
+  tel: string;
+  horarioAperturaMañana?: string;
+  horarioCierreMañana?: string;
+  horarioAperturaTarde?: string;
+  horarioCierreTarde?: string;
+  image: string;
+  detail: string;
+  turn: FirebaseFirestoreTypes.Timestamp[];
+};
 
 export type Local = {
   id: string;
   name: string;
   descrip: string;
-  direccion: string;
   image: string;
-  tel: string;
+  direccion: string;
+  tel: []
   url: string;
 };
 

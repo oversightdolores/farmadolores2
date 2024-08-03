@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 const Login: React.FC = () => {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const colors = theme.colors
   const navigation = useNavigation();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -40,7 +41,7 @@ const Login: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      {/* <Image source={require('../assets/logo.png')} style={styles.logo} /> */}
       <Text style={[styles.title, { color: colors.text }]}>Bienvenido</Text>
       <TextInput
         style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
@@ -58,19 +59,20 @@ const Login: React.FC = () => {
         secureTextEntry
         placeholderTextColor={colors.placeholderText}
       />
+      <TouchableOpacity style={[styles.button,styles.registerButton, { backgroundColor: colors.background, borderColor: colors.primary }]} onPress={handleLogin}>
+            <Text style={[styles.buttonText, { color: colors.primary }]}>Iniciar sesión</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.registerButton, {backgroundColor: colors.background, borderColor: colors.primary }]} onPress={handleRegister}>
+            <Text style={[styles.buttonText, styles.registerButtonText, { color: colors.primary }]}>Registrarse</Text>
+          </TouchableOpacity>
       {loading ? (
         <ActivityIndicator size="large" color={colors.notification} />
       ) : (
         <>
-          <TouchableOpacity style={[styles.button, { backgroundColor: colors.buttonBackground }]} onPress={handleLogin}>
-            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Iniciar sesión</Text>
-          </TouchableOpacity>
+          
           <TouchableOpacity style={[styles.button, styles.googleButton, { backgroundColor: '#db4437' }]} onPress={handleGoogleLogin}>
             <Icon name="google" size={20} color="#fff" style={styles.googleIcon} />
             <Text style={[styles.buttonText, { color: colors.buttonText }]}>Iniciar sesión con Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.registerButton, { borderColor: colors.primary }]} onPress={handleRegister}>
-            <Text style={[styles.buttonText, styles.registerButtonText, { color: colors.primary }]}>Registrarse</Text>
           </TouchableOpacity>
         </>
       )}
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
+    elevation: 3,
   },
   button: {
     width: '100%',
@@ -112,6 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
+    elevation: 3,
   },
   buttonText: {
     fontSize: 16,
@@ -119,12 +123,13 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     flexDirection: 'row',
+    elevation: 3,
   },
   googleIcon: {
     marginRight: 10,
   },
   registerButton: {
-    backgroundColor: 'transparent',
+   
     borderWidth: 1,
   },
   registerButtonText: {

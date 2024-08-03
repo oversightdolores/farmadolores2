@@ -4,7 +4,7 @@ import firestore, { GeoPoint } from '@react-native-firebase/firestore';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 import EmergenciaCard from '../components/EmergenciaCard';
 type Emergencia = {

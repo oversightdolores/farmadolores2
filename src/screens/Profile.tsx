@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../context/ThemeContext';
 import SettingsScreen from './SettingsScreen';
 import { RootStackParamList } from '../types/navigationTypes';
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 const Profile: React.FC = () => {

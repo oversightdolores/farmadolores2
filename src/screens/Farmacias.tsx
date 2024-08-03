@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, Text, Button } from 'react-native';
 import FarmaciaCard from '../components/FarmaciaCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
-import AdBanner from '../components/AdBanner';
+import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 import SkeletonCard from '../skeleton/SkeletonCard'; // Asegúrate de ajustar la ruta de importación según sea necesario
 import { usePharmacies } from '../context/PharmacyContext';

@@ -63,7 +63,7 @@ const AppStack = () => {
       <Stack.Screen name="Farmacias" component={Farmacias} options={{ headerShown: false }} />
       <Stack.Screen name="Emergencias" component={Emergencias} options={{ headerShown: false }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
-      <Stack.Screen name="PrimeroAuxilios" component={PrimerosAuxilios} options={{ headerShown: false }} />
+      <Stack.Screen name="PrimeroAuxilios" component={PrimerosAuxilios}  />
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
       <Stack.Screen name="Local" component={Locales} options={{ title: 'Locales' }} />
       <Stack.Screen name="LocalDetail" component={LocalDetailScreen} options={{ title: 'Detalles del Local' }} />

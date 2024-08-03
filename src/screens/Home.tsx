@@ -2,8 +2,8 @@ import React from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import Turno from '../components/Turno';
-import AdScreen from '../components/AdScreen';
-import AdBanner from '../components/AdBanner';
+import AdScreen from '../components/ads/AdScreen';
+import AdBanner from '../components/ads/AdBanner';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes'; // Asegúrate de que la ruta sea correcta
@@ -75,10 +75,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
+    width: '90%',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
     marginTop: 20,
+    elevation: 5,
   },
   buttonText: {
     fontSize: 18,
