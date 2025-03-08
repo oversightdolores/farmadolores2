@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, DrawerLayoutAndroid, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, DrawerLayoutAndroid, StatusBar, Linking } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,13 +16,11 @@ const Profile: React.FC = () => {
   const { theme } = useTheme();
   const { colors } = theme;
   const drawerRef = useRef<DrawerLayoutAndroid>(null);
+  const cafecitoLink = 'https://cafecito.app/crazedev';
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Error logging out: ', error);
-    }
+
+  const handleCafecitoPress = () => {
+    Linking.openURL(cafecitoLink);
   };
 
   return (
@@ -41,7 +39,7 @@ const Profile: React.FC = () => {
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
       />
         <View style={[styles.header, {backgroundColor: colors.background}]}>
-          <Text style={[styles.headerTitle, {color: colors.text}]}>Profile</Text>
+          <Text style={[styles.headerTitle, {color: colors.text}]}>Perfil</Text>
           <TouchableOpacity onPress={() => drawerRef.current?.openDrawer()}>
             <Icon name="menu" size={30} color={colors.text} />
           </TouchableOpacity>
@@ -55,20 +53,19 @@ const Profile: React.FC = () => {
           <Text style={[styles.name, {color: colors.text}]}>{user?.displayName || 'User Name'}</Text>
           <Text style={[styles.email, {color: colors.text}]}>{user?.email || 'user@example.com'}</Text>
           <Text style={[styles.bio, {color: colors.text}]}>
-            This is the bio of the user. It can be a few lines long and give a brief description about the user.
+          ¡Gracias por usar nuestra aplicación! Apreciamos tu confianza y apoyo. Nos esforzamos por ofrecerte la mejor experiencia posible. Tu satisfacción es nuestra prioridad.
           </Text>
+        <View style={styles.cafecitoContainer}>
+        <Text style={[styles.cafecitoText, { color: colors.text }]}>
+          ¿Te gusta mi trabajo? ¡Invítame un cafecito!
+        </Text>
+        <TouchableOpacity style={[styles.cafecitoButton, { backgroundColor: colors.card }]} onPress={handleCafecitoPress}>
+          <Icon name="local-cafe" size={24} color={colors.text} />
+          <Text style={[styles.cafecitoButtonText, {color: colors.text}]}>Donar en Cafecito</Text>
+        </TouchableOpacity>
+      </View>
         </View>
-        <View style={styles.menu}>
-          {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
-            <Icon name="settings" size={20} color="#333" />
-            <Text style={styles.buttonText}>Settings</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={toggleTheme}>
-            <Icon name="brightness-6" size={20} color="#333" />
-            <Text style={styles.buttonText}>Toggle Theme</Text>
-          </TouchableOpacity> */}
-          
-        </View>
+        
       </View>
       <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
     </DrawerLayoutAndroid>
@@ -158,5 +155,25 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  cafecitoContainer: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  cafecitoText: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  cafecitoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  cafecitoButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
   },
 });

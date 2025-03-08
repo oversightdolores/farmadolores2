@@ -34,8 +34,8 @@ const DetailScreen = () => {
         <TouchableOpacity onPress={() => makeCall(farmacia.tel)}>
           <Text style={[styles.info, { color: colors.text, textDecorationLine: 'underline' }]}>Teléfono: {farmacia.tel}</Text>
         </TouchableOpacity>
-        <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {farmacia.horarioAperturaMañana} - {farmacia.horarioCierreMañana}</Text>
-        <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {farmacia.horarioAperturaTarde} - {farmacia.horarioCierreTarde}</Text>
+        <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {farmacia.horarioAperturaMañana?.toDate().toLocaleTimeString()} - {farmacia.horarioCierreMañana?.toDate().toLocaleTimeString()}</Text>
+        <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {farmacia.horarioAperturaTarde?.toDate().toLocaleTimeString()} - {farmacia.horarioCierreTarde?.toDate().toLocaleTimeString()}</Text>
       </View>
       <View style={styles.mapContainer}>
         <MapView

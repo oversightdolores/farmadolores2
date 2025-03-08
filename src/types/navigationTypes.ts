@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firestore';
 import { GeoPoint } from 'firebase/firestore';
 
 export type Farmacia = {
@@ -6,27 +6,33 @@ export type Farmacia = {
   name: string;
   dir: string;
   tel: string;
-  horarioAperturaMañana: string;
-  horarioCierreMañana: string;
-  horarioAperturaTarde: string;
-  horarioCierreTarde: string;
   image: string;
+  horarioAperturaMañana?: Timestamp;
+  horarioCierreMañana?: Timestamp;
+  horarioAperturaTarde?: Timestamp;
+  horarioCierreTarde?: Timestamp;
   detail: string;
-  turn: [];
+  turn: Turno[];
   gps: GeoPoint;
+};
+
+
+export type Turno = {
+  dia: string;
+  horario: string;
 };
 export type FarmaciaConTiempos = {
   id: string;
   name: string;
   dir: string;
   tel: string;
-  horarioAperturaMañana?: string;
-  horarioCierreMañana?: string;
-  horarioAperturaTarde?: string;
-  horarioCierreTarde?: string;
+  horarioAperturaMañana?: Timestamp;
+  horarioCierreMañana?: Timestamp;
+  horarioAperturaTarde?: Timestamp;
+  horarioCierreTarde?: Timestamp;
   image: string;
   detail: string;
-  turn: FirebaseFirestoreTypes.Timestamp[];
+  turn: Turno[];
 };
 
 export type Local = {
@@ -60,10 +66,10 @@ export type RootStackParamList = {
     tel: string;
     image: string;
     detail: string;
-    horarioAperturaMañana?: string;
-    horarioCierreMañana?: string;
-    horarioAperturaTarde?: string;
-    horarioCierreTarde?: string;
+    horarioAperturaMañana?: Timestamp;
+    horarioCierreMañana?: Timestamp;
+    horarioAperturaTarde?: Timestamp;
+    horarioCierreTarde?: Timestamp;
   };
   BottomTabs: undefined;
   Detail: { farmacia: Farmacia };
@@ -82,4 +88,7 @@ export type RootStackParamList = {
   PrimeroAuxilios: undefined;
   Local: undefined;
   LocalDetail: { local: Local };
+  Help: undefined;
+  ReportProblem: undefined;
+  EditProfile: undefined;
 };

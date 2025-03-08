@@ -1,23 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigationTypes';
-import { NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import { DateTime } from 'luxon';
+import { RootStackParamList, Farmacia } from '../types/navigationTypes';
 
-type Farmacia = {
-  id: string;
-  name: string;
-  dir: string;
-  tel: string;
-  horarioAperturaMañana?: string;
-  horarioCierreMañana?: string;
-  horarioAperturaTarde?: string;
-  horarioCierreTarde?: string;
-  image: string;
-  detail: string;
-  turn: any; // Ajusta esto según sea necesario
-};
+
 
 type TurnoCardProps = {
   item: Farmacia;
@@ -29,23 +17,63 @@ const TurnoCard: React.FC<TurnoCardProps> = ({ item, onPress }) => {
   const { theme } = useTheme();
   const { colors } = theme;
 
-  const { name, dir, tel, horarioAperturaMañana, horarioCierreMañana, horarioAperturaTarde, horarioCierreTarde, detail } = item;
+  const {
+    name,
+    dir,
+    tel,
+    horarioAperturaMañana,
+    horarioCierreMañana,
+    horarioAperturaTarde,
+    horarioCierreTarde,
+    detail
+  } = item;
+
+  // 1) Conviertes los campos Timestamp a string con Luxon (o .toDateString(), etc.)
+  const aperturaMañanaStr =
+    horarioAperturaMañana
+      ? DateTime.fromJSDate(horarioAperturaMañana.toDate()).setZone('America/Argentina/Buenos_Aires').toFormat('HH:mm')
+      : null;
+
+  const cierreMañanaStr =
+    horarioCierreMañana
+      ? DateTime.fromJSDate(horarioCierreMañana.toDate()).setZone('America/Argentina/Buenos_Aires').toFormat('HH:mm')
+      : null;
+
+  const aperturaTardeStr =
+    horarioAperturaTarde
+      ? DateTime.fromJSDate(horarioAperturaTarde.toDate()).setZone('America/Argentina/Buenos_Aires').toFormat('HH:mm')
+      : null;
+
+  const cierreTardeStr =
+    horarioCierreTarde
+      ? DateTime.fromJSDate(horarioCierreTarde.toDate()).setZone('America/Argentina/Buenos_Aires').toFormat('HH:mm')
+      : null;
 
   return (
     <TouchableOpacity onPress={() => navigation.navigate('Detail', { farmacia: item })}>
       <View style={[styles.card, { backgroundColor: colors.card }]}>
+        {/* 'detail' aquí asumo que es una URL de imagen, no un objeto. */}
         <Image source={{ uri: detail }} style={styles.image} />
+        
         <View style={styles.infoContainer}>
           <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
           <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
           <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
-          {horarioAperturaMañana && horarioCierreMañana && (
-            <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
+
+          {/* 2) Solo mostramos si existen ambas strings */}
+          {aperturaMañanaStr && cierreMañanaStr && (
+            <Text style={[styles.info, { color: colors.text }]}>
+              Horario Mañana: {aperturaMañanaStr} - {cierreMañanaStr}
+            </Text>
           )}
-          {horarioAperturaTarde && horarioCierreTarde && (
-            <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
+
+          {aperturaTardeStr && cierreTardeStr && (
+            <Text style={[styles.info, { color: colors.text }]}>
+              Horario Tarde: {aperturaTardeStr} - {cierreTardeStr}
+            </Text>
           )}
         </View>
+
         <View style={styles.turnoBadge}>
           <Text style={styles.turnoText}>De Turno</Text>
         </View>

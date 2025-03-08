@@ -60,9 +60,14 @@ const Home = () => {
             Ver Locales
           </Text>
         </TouchableOpacity>
+        <View style={{ marginTop: 20 }}>
+      <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
+        </View>
       </View>
+
       <AdScreen /> 
       </>
+
 
 );
 };

@@ -11,14 +11,30 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-      
+        maven {
+         
+          url("${project(':react-native-background-fetch').projectDir}/libs")
+      }
+
     }
+    allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+    // react-native-background-fetch
+    url("${project(':react-native-background-fetch').projectDir}/libs")
+}
+    }
+}
     dependencies {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
         classpath 'com.google.gms:google-services:4.4.2'
     }
+
+    
   
 }
 

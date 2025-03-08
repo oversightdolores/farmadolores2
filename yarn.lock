@@ -6020,6 +6020,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.2
     react-native-async-storage: ^0.0.1
+    react-native-background-fetch: ^4.2.7
     react-native-code-push: ^8.3.1
     react-native-elements: ^3.4.3
     react-native-gesture-handler: ^2.17.1
@@ -9721,6 +9722,13 @@ __metadata:
   peerDependencies:
     react-native: ">=0.5.0"
   checksum: 60a1abd5c8a872997949dff7542655f3ef34cb6594573402849a1a127aba6c980c0ad6a7ab2fa786456055b2ba13d4daa78b513544b164e009941c5c88192e5e
+  languageName: node
+  linkType: hard
+
+"react-native-background-fetch@npm:^4.2.7":
+  version: 4.2.7
+  resolution: "react-native-background-fetch@npm:4.2.7"
+  checksum: c4aa6965a37126a5fc389293e0a8615fb4ee263cefbb3a8249377f22452f72e5ee43d391fac12c3cfa24e912e78f034a7f96507b0f3690077ce3bc6224a872bb
   languageName: node
   linkType: hard
 

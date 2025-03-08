@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../types/navigationTypes';
+import AnimatedToggleSwitch from '../components/AnimatedToggleSwitch';
 
 const SettingsScreen: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { colors } = theme;
   const { logout, loading } = useAuth();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isDarkTheme, setIsDarkTheme] = useState(theme.dark);
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+    setIsDarkTheme(!isDarkTheme);
+  };
 
   const handleLogout = async () => {
     try {
@@ -21,29 +31,35 @@ const SettingsScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
       <View style={styles.menu}>
-        <TouchableOpacity style={styles.menuItem} onPress={toggleTheme}>
-          <Icon name="brightness-6" size={24} color={colors.text} />
-          <Text style={[styles.menuText, { color: colors.text }]}>Toggle Theme</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => { /* Navegar a Editar Perfil */ }}>
+        <View style={styles.menuItem}>
+          <Text style={[styles.menuText, { color: colors.text }]}>Theme</Text>
+          <AnimatedToggleSwitch  isOn={isDarkTheme} onToggle={handleToggleTheme} />
+        </View>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('EditProfile')}>
           <Icon name="edit" size={24} color={colors.text} />
-          <Text style={[styles.menuText, { color: colors.text }]}>Edit Profile</Text>
+          <Text style={[styles.menuText, { color: colors.text }]}>Editar perfil</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => { /* Navegar a Reportar Problema */ }}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ReportProblem')}>
           <Icon name="report-problem" size={24} color={colors.text} />
-          <Text style={[styles.menuText, { color: colors.text }]}>Report Problem</Text>
+          <Text style={[styles.menuText, { color: colors.text }]}>Reporte</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Help')}>
+          <Icon name="help-outline" size={24} color={colors.text} />
+          <Text style={[styles.menuText, { color: colors.text }]}>Ayuda</Text>
         </TouchableOpacity>
         {loading ? (
           <View style={styles.menuItem}>
             <ActivityIndicator size="large" color="#007bff" />
           </View>
-          ) : (
-        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-          <Icon name="logout" size={24} color={colors.error} />
-          <Text style={[styles.menuText, { color: colors.error }]}>Logout</Text>
-        </TouchableOpacity>
-            
-          )}
+        ) : (
+          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+            <Icon name="logout" size={24} color={colors.error} />
+            <Text style={[styles.menuText, { color: colors.error }]}>Cerrar sesion</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <View style={styles.versionContainer}>
+        <Text style={[styles.versionText, { color: colors.text }]}>Versión 1.8.14</Text>
       </View>
     </View>
   );
@@ -73,7 +89,16 @@ const styles = StyleSheet.create({
   },
   menuText: {
     marginLeft: 20,
+    marginRight: 'auto',
     fontSize: 15,
     color: '#333',
+  },
+  versionContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  versionText: {
+    fontSize: 14,
+    color: '#888',
   },
 });

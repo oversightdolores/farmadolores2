@@ -2,25 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { DateTime } from 'luxon';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigationTypes';
+import { RootStackParamList, Farmacia } from '../types/navigationTypes';
 import { NavigationProp } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
-import { GeoPoint } from '@react-native-firebase/firestore';
 
-type Farmacia = {
-  id: string;
-  name: string;
-  dir: string;
-  tel: string;
-  horarioAperturaMañana: string;
-  horarioCierreMañana: string;
-  horarioAperturaTarde: string;
-  horarioCierreTarde: string;
-  image: string;
-  detail: string;
-  turn: any; // Puede ajustar esto según sea necesario
-  gps: GeoPoint;
-};
 
 type Status = 'Abierto' | 'Cierra Pronto' | 'Cerrado';
 
@@ -47,12 +32,13 @@ const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
     }
 
     const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
+    
 
-    const aperturaMañana = DateTime.fromFormat(horarioAperturaMañana, 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const cierreMañana = DateTime.fromFormat(horarioCierreMañana, 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const aperturaTarde = DateTime.fromFormat(horarioAperturaTarde, 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const cierreTarde = DateTime.fromFormat(horarioCierreTarde, 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-
+    const aperturaMañana = DateTime.fromFormat(horarioAperturaMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
+    const cierreMañana = DateTime.fromFormat(horarioCierreMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
+    const aperturaTarde = DateTime.fromFormat(horarioAperturaTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
+    const cierreTarde = DateTime.fromFormat(horarioCierreTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
+    
     const minutosAntesDeCerrar = 30;
     const cierraProntoMañana = cierreMañana.minus({ minutes: minutosAntesDeCerrar });
     const cierraProntoTarde = cierreTarde.minus({ minutes: minutosAntesDeCerrar });
@@ -83,8 +69,8 @@ const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
           <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
           <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
           <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana} - {horarioCierreMañana}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde} - {horarioCierreTarde}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - {horarioCierreMañana?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - {horarioCierreTarde?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</Text>
         </View>
         <View style={[styles.statusBadge, statusStyles[status]]}>
           <Text style={styles.statusText}>{status}</Text>

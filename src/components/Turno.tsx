@@ -1,19 +1,27 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// Turno.tsx
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { usePharmacies } from '../context/PharmacyContext';
-import TurnoCard from './TurnoCard';
 import SkeletonCard from '../skeleton/SkeletonCard';
 import { DateTime } from 'luxon';
-import { showNotification } from '../services/notificationService';
-import { createNotificationChannels } from '../constants/notificationChannels';
-import { TimestampTrigger, TriggerType } from '@notifee/react-native';
+import { useTheme } from '../context/ThemeContext';
+import TurnoCard from './TurnoCard';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 const Turno: React.FC = () => {
-  const { farmacias, loading } = usePharmacies();
-
+  const { theme } = useTheme();
+  const { colors } = theme;
+  const { farmacias, loading, fetchPharmacies } = usePharmacies();
   const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-  const matchingPharmacy = farmacias.find((pharmacy) => {
-    return pharmacy.turn.some((t) => {
+
+  // Si está cargando, muestra el Skeleton
+  if (loading) {
+    return <SkeletonCard />;
+  }
+
+  // Lógica para encontrar la farmacia de turno
+  const matchingPharmacy = farmacias.find((pharmacy) =>
+    pharmacy.turn.some((t) => {
       const turnStart = DateTime.fromJSDate(t.toDate()).set({
         hour: 8,
         minute: 30,
@@ -21,75 +29,30 @@ const Turno: React.FC = () => {
         millisecond: 0,
       });
       const turnEnd = turnStart.plus({ hours: 24 });
-
       return now >= turnStart && now <= turnEnd;
-    });
-  });
+    })
+  );
 
-  useEffect(() => {
-    const initialize = async () => {
-      await createNotificationChannels();
-
-      if (matchingPharmacy) {
-        await scheduleNotifications(matchingPharmacy, now);
-      }
-    };
-
-    initialize();
-  }, [matchingPharmacy, now]);
-
-  const scheduleNotifications = async (pharmacy: any, now: DateTime) => {
-    const notifications = [
-      {
-        hour: 8,
-        minute: 35,
-        title: 'De turno hoy',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-      {
-        hour: 12,
-        minute: 0,
-        title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-      {
-        hour: 20,
-        minute: 0,
-        title: 'Recordatorio de Turno',
-        body: `La farmacia de turno es ${pharmacy.name}`,
-      },
-    ];
-
-    for (const { hour, minute, title, body } of notifications) {
-      const notificationTime = now.set({
-        hour,
-        minute,
-        second: 0,
-        millisecond: 0,
-      });
-
-      if (notificationTime > now) {
-        const trigger: TimestampTrigger = {
-          type: TriggerType.TIMESTAMP,
-          timestamp: notificationTime.toMillis(),
-        };
-
-        await showNotification(title, body, { name: pharmacy.name, dir: pharmacy.dir, image: pharmacy.image, detail: pharmacy.detail }, trigger);
-      }
-    }
+  // Botón que dispara el fetch manual
+  const handleReload = () => {
+    fetchPharmacies();
   };
-
-  if (loading) {
-    return <SkeletonCard />;
-  }
 
   return (
     <View style={styles.container}>
       {matchingPharmacy ? (
-        <TurnoCard item={matchingPharmacy} onPress={(item) => { }} />
+        <TurnoCard item={matchingPharmacy} onPress={() => {}} />
       ) : (
         <View style={styles.noTurnos}>
-          <Text style={styles.noTurnosText}>No hay farmacias de turno en este momento</Text>
+          <Text style={[styles.noTurnosText, { color: colors.text }]}>
+            No hay farmacias de turno en este momento
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.card }]}
+            onPress={handleReload}
+          >
+            <Icon name="reload1" size={40} color={colors.text} />
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -103,19 +66,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noTurnos: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   noTurnosText: {
     fontSize: 18,
-    color: 'black',
     textAlign: 'center',
+    marginBottom: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  button: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 100,
   },
 });

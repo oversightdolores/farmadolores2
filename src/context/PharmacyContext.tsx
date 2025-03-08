@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import firestore, { FirebaseFirestoreTypes, GeoPoint } from '@react-native-firebase/firestore';
 import { DateTime } from 'luxon';
 
@@ -20,17 +20,7 @@ type Farmacia = {
 type PharmacyContextType = {
   farmacias: Farmacia[];
   loading: boolean;
-};
-
-const isTimestamp = (value: any): value is FirebaseFirestoreTypes.Timestamp => {
-  return value instanceof firestore.Timestamp;
-};
-
-const formatTime = (timestamp: FirebaseFirestoreTypes.Timestamp | string): string => {
-  if (isTimestamp(timestamp)) {
-    return DateTime.fromJSDate(timestamp.toDate()).setZone('America/Argentina/Buenos_Aires').toLocaleString(DateTime.TIME_24_SIMPLE);
-  }
-  return timestamp;
+  fetchPharmacies: () => void;
 };
 
 const PharmacyContext = createContext<PharmacyContextType | undefined>(undefined);
@@ -38,36 +28,52 @@ const PharmacyContext = createContext<PharmacyContextType | undefined>(undefined
 export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Suscripción en tiempo real
   useEffect(() => {
-    const unsubscribe = firestore().collection('farmacias').onSnapshot(snapshot => {
-      const fetchedFarmacias: Farmacia[] = snapshot.docs.map(doc => {
-        const data = doc.data() as Omit<Farmacia, 'id'> & { turn: FirebaseFirestoreTypes.Timestamp[] };
-        return {
-          ...data,
-          id: doc.id,
-          horarioAperturaMañana: formatTime(data.horarioAperturaMañana),
-          horarioCierreMañana: formatTime(data.horarioCierreMañana),
-          horarioAperturaTarde: formatTime(data.horarioAperturaTarde),
-          horarioCierreTarde: formatTime(data.horarioCierreTarde),
-        };
-      });
+    const unsubscribe = firestore()
+      .collection('farmacias')
+      .onSnapshot(
+        snapshot => {
+          const fetchedFarmacias: Farmacia[] = snapshot.docs.map(doc => {
+            const data = doc.data() as Farmacia;  // Ajusta tipo si hace falta
+            return { ...data, id: doc.id };
+          });
 
-      setFarmacias(fetchedFarmacias);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching farmacias: ", error);
-      setError("Hubo un problema al cargar los datos. Por favor, inténtalo de nuevo.");
-      setLoading(false);
-    });
+          setFarmacias(fetchedFarmacias);
+          setLoading(false);
+        },
+        error => {
+          console.error('Error onSnapshot: ', error);
+          setLoading(false);
+        }
+      );
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
+  // Función manual de recarga (opcional)
+  const fetchPharmacies = useCallback(() => {
+    setLoading(true);
+    firestore()
+      .collection('farmacias')
+      .get()
+      .then(snapshot => {
+        const fetchedFarmacias: Farmacia[] = snapshot.docs.map(doc => {
+          const data = doc.data() as Farmacia;
+          return { ...data, id: doc.id };
+        });
+        setFarmacias(fetchedFarmacias);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetchPharmacies:', error);
+        setLoading(false);
+      });
+  }, []);
+
   return (
-    <PharmacyContext.Provider value={{ farmacias, loading }}>
+    <PharmacyContext.Provider value={{ farmacias, loading, fetchPharmacies }}>
       {children}
     </PharmacyContext.Provider>
   );
