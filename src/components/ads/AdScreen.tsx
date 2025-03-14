@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert, Button, View } from 'react-native';
 import { InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
 
-const adUnitId = 'ca-app-pub-1460570234418559/1592012526';
+const adUnitId = 'ca-app-pub-2226872749228128/2550937874';
 const interstitial = InterstitialAd.createForAdRequest(adUnitId);
 
 const showInterstitialAd = () => {
