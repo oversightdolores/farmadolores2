@@ -4,6 +4,13 @@ import notifee, {
   TimestampTrigger,
 } from '@notifee/react-native';
 
+export interface NotificationData {
+  name: string;
+  dir: string;
+  image: string;
+  detail: string;
+}
+
 /**
  * showNotification
  * @param title Título de la notificación
@@ -14,9 +21,9 @@ import notifee, {
 export const showNotification = async (
   title: string,
   body: string,
-  data: any,
-  trigger: TimestampTrigger
-) => {
+  data: NotificationData,
+  trigger: TimestampTrigger,
+): Promise<void> => {
   // Creamos una notificación con trigger (programada)
   await notifee.createTriggerNotification(
     {
