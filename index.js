@@ -7,6 +7,7 @@ import App from './App';
 import {name as appName} from './app.json';
 import notifee, { EventType } from '@notifee/react-native';
 import 'react-native-gesture-handler';
+import './backgroundFetchHeadless';
 
 notifee.onBackgroundEvent(async ({ type, detail }) => {
   const { notification, pressAction } = detail;
