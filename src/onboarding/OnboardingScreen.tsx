@@ -10,7 +10,7 @@ import Pagination from './Pagination';
 import CustomButton from './CustomButton';
 import RenderItem from './RenderItem';
 type OnboardingScreenProps = {
-    setIsFirstLaunch: (value: boolean) => void;
+    setIsFirstLaunch: React.Dispatch<React.SetStateAction<boolean | null>>;
   };
   const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ setIsFirstLaunch }) =>{
   const flatListRef = useAnimatedRef<FlatList<OnboardingData>>();

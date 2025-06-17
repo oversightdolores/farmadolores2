@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-design-icons';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import AnimatedToggleSwitch from '../components/AnimatedToggleSwitch';
+import DeviceInfo from 'react-native-device-info'
 
 const SettingsScreen: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const { colors } = theme;
+  const { colors, dark } = theme;
   const { logout, loading } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isDarkTheme, setIsDarkTheme] = useState(theme.dark);
-
+  const version = DeviceInfo.getVersion();
   const handleToggleTheme = () => {
     toggleTheme();
     setIsDarkTheme(!isDarkTheme);
@@ -26,6 +27,7 @@ const SettingsScreen: React.FC = () => {
       console.error('Error logging out: ', error);
     }
   };
+  console.log('version', dark); 
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -36,15 +38,15 @@ const SettingsScreen: React.FC = () => {
           <AnimatedToggleSwitch  isOn={isDarkTheme} onToggle={handleToggleTheme} />
         </View>
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('EditProfile')}>
-          <Icon name="edit" size={24} color={colors.text} />
+          <Icon name="account-edit" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Editar perfil</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ReportProblem')}>
-          <Icon name="report-problem" size={24} color={colors.text} />
+          <Icon name="alert-circle" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Reporte</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Help')}>
-          <Icon name="help-outline" size={24} color={colors.text} />
+          <Icon name="help-circle-outline" size={24} color={colors.text} />
           <Text style={[styles.menuText, { color: colors.text }]}>Ayuda</Text>
         </TouchableOpacity>
         {loading ? (
@@ -59,7 +61,7 @@ const SettingsScreen: React.FC = () => {
         )}
       </View>
       <View style={styles.versionContainer}>
-        <Text style={[styles.versionText, { color: colors.text }]}>Versión 1.8.14</Text>
+        <Text style={[styles.versionText, { color: colors.text }]}>Versión {DeviceInfo.getVersion()}</Text>
       </View>
     </View>
   );
@@ -81,6 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItem: {
+   
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
@@ -88,17 +91,22 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   menuText: {
+    flex: 1,
     marginLeft: 20,
     marginRight: 'auto',
     fontSize: 15,
     color: '#333',
   },
   versionContainer: {
-    alignItems: 'center',
-    marginTop: 20,
+    
+    justifyContent: 'center',
+    width: '100%',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
   versionText: {
     fontSize: 14,
-    color: '#888',
+    
   },
 });

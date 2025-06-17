@@ -2,15 +2,16 @@ import React, { useRef } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, DrawerLayoutAndroid, StatusBar, Linking } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-design-icons';
 import { useTheme } from '../context/ThemeContext';
-import SettingsScreen from './SettingsScreen';
+//import SettingsScreen from './SettingsScreen';
 import { RootStackParamList } from '../types/navigationTypes';
 import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
+import SettingsScreen from './SettingsScreen';
 
 const Profile: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  //const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout, loading } = useAuth();
   const { toggleTheme } = useTheme();
   const { theme } = useTheme();
@@ -29,7 +30,7 @@ const Profile: React.FC = () => {
       drawerWidth={300}
       drawerPosition={'right'}
       renderNavigationView={() => (
-        <View style={styles.drawerContent}>
+        <View style={[styles.drawerContent, {backgroundColor: colors.background}]}>
           <SettingsScreen />
         </View>
       )}
@@ -60,7 +61,7 @@ const Profile: React.FC = () => {
           ¿Te gusta mi trabajo? ¡Invítame un cafecito!
         </Text>
         <TouchableOpacity style={[styles.cafecitoButton, { backgroundColor: colors.card }]} onPress={handleCafecitoPress}>
-          <Icon name="local-cafe" size={24} color={colors.text} />
+          <Icon name="coffee" size={24} color={colors.text} />
           <Text style={[styles.cafecitoButtonText, {color: colors.text}]}>Donar en Cafecito</Text>
         </TouchableOpacity>
       </View>

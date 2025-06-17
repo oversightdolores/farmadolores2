@@ -1,7 +1,6 @@
 // App.tsx
-import React, { useEffect } from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useEffect } from 'react';
+import { StatusBar, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Tu navegación y contextos
@@ -10,27 +9,30 @@ import { AuthContextProvider } from './src/context/AuthContext';
 import AppNavigator from './src/screens/AppNavigator';
 
 // Para actualizaciones CodePush (si lo usas)
-import codePush from 'react-native-code-push';
 
 // Importamos BackgroundFetch
 import BackgroundFetch from 'react-native-background-fetch';
-
 // Importamos la función que hace el chequeo y la notificación
-import { checkAndNotifyTurnos } from './src/services/TurnoService';
+import { checkAndNotifyTurnos } from './src/services/TurnoService'; 
+import { ThemeContextProvider,useTheme } from './src/context/ThemeContext';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-const codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_START };
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+
+  const {theme} = useTheme()
+  const {colors,dark} = theme;
+  const style = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+  });
 
   useEffect(() => {
     // Inicializa y configura BackgroundFetch al montar el componente raíz
     const initBackgroundFetch = async () => {
-      console.log('app')
       BackgroundFetch.configure(
         {
           minimumFetchInterval: 15, // Se intentará ejecutar aprox cada 15 minutos
@@ -61,16 +63,22 @@ const App = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
       <AuthContextProvider>
-        <StatusBar
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={backgroundStyle.backgroundColor}
-        />
-        {/* Navegación principal */}
+        <ThemeContextProvider>
+        <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+          <StatusBar
+            barStyle={dark ? 'light-content' : 'dark-content'}
+            backgroundColor={colors.background} // Cambia el color de fondo del StatusBar
+          />
+          {/* Navegación principal */}
         <AppNavigator />
+          </SafeAreaView>
+        </ThemeContextProvider>
       </AuthContextProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 };
 
-export default codePush(codePushOptions)(App);
+export default App;

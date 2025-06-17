@@ -3,6 +3,7 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useTheme } from './ThemeContext';
+import { ToastAndroid } from 'react-native';
 
 // Configura Google Sign-In
 GoogleSignin.configure({
@@ -58,14 +59,16 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const login = async (email: string, password: string) => {
     if (!email || !password) {
-      throw new Error('Both email and password are required.');
+      ToastAndroid.show('Email y contraseña requeridos', ToastAndroid.SHORT);
+      return;
     }
+
     setLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      console.error('Error logging in: ', error);
-      throw error;
+    } catch (error: any) {
+      ToastAndroid.show(error.message || 'Error iniciando sesión', ToastAndroid.LONG);
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
@@ -73,14 +76,16 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const register = async (email: string, password: string) => {
     if (!email || !password) {
-      throw new Error('Email y contraseña son requeridos.');
+      ToastAndroid.show('Email y contraseña requeridos', ToastAndroid.SHORT);
+      return;
     }
+
     setLoading(true);
     try {
       await auth().createUserWithEmailAndPassword(email, password);
-    } catch (error) {
-      console.error('Error registering: ', error);
-      throw error;
+    } catch (error: any) {
+      ToastAndroid.show(error.message || 'Error registrando usuario', ToastAndroid.LONG);
+      console.error('Register error:', error);
     } finally {
       setLoading(false);
     }
@@ -91,11 +96,11 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(userInfo.idToken);
+      const googleCredential = auth.GoogleAuthProvider.credential(userInfo?.data?.idToken);
       await auth().signInWithCredential(googleCredential);
-    } catch (error) {
-      console.error('Error logging in with Google: ', error);
-      throw error;
+    } catch (error: any) {
+      ToastAndroid.show(error.message || 'Error con Google Sign-In', ToastAndroid.LONG);
+      console.error('Google login error:', error);
     } finally {
       setLoading(false);
     }
@@ -106,21 +111,32 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       await auth().signOut();
       await GoogleSignin.signOut();
-    } catch (error) {
-      console.error('Error logging out: ', error);
-      throw error;
+    } catch (error: any) {
+      ToastAndroid.show('Error cerrando sesión', ToastAndroid.LONG);
+      console.error('Logout error:', error);
     } finally {
       setUser(null);
       setIsAuth(false);
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('theme');
-      resetTheme(); // Restablece el tema por defecto
+      resetTheme();
       setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuth, loading, login, register, loginWithGoogle, logout, setUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuth,
+        loading,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -3,39 +3,51 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from '@react-native-vector-icons/material-design-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigationTypes';
 
 const Login: React.FC = () => {
   const { theme } = useTheme();
   const colors = theme.colors
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const { login, loginWithGoogle, loading } = useAuth();
 
   const handleLogin = async () => {
+    setErrorMsg('');
     if (!email || !password) {
+      setErrorMsg('El email y la contraseña son obligatorios.');
       Alert.alert('Error de validación', 'El email y la contraseña son obligatorios.');
       return;
     }
     try {
       await login(email, password);
+      setErrorMsg('');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' as keyof RootStackParamList }],
+      });
     } catch (error) {
-      console.error('Error iniciando sesión: ', error);
-      Alert.alert('Error de inicio de sesión', error.message);
+      const errMsg = error instanceof Error ? error.message : 'Error de inicio de sesión';
+      setErrorMsg(errMsg);
+      Alert.alert('Error de inicio de sesión', errMsg);
     }
   };
 
   const handleRegister = () => {
-    navigation.navigate('Register');
+    navigation.navigate({ name: 'Register' } as any);
   };
 
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
     } catch (error) {
+      const errMsg = error instanceof Error ? error.message : 'Error de inicio de sesión con Google';
       console.error('Error iniciando sesión con Google: ', error);
-      Alert.alert('Error de inicio de sesión con Google', error.message);
+      Alert.alert('Error de inicio de sesión con Google', errMsg);
     }
   };
 
@@ -43,6 +55,8 @@ const Login: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* <Image source={require('../assets/logo.png')} style={styles.logo} /> */}
       <Text style={[styles.title, { color: colors.text }]}>Bienvenido</Text>
+      {/* Mostrar error visual */}
+      {errorMsg ? <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text> : null}
       <TextInput
         style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
         placeholder="Email"

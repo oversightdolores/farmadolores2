@@ -1,72 +1,73 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeProvider as NavigationThemeProvider, DefaultTheme as NavDefaultTheme, DarkTheme as NavDarkTheme, Theme as NavTheme } from '@react-navigation/native';
 import { lightTheme, darkTheme } from '../theme';
 
-// Define el tipo para tu tema
 type ThemeType = typeof lightTheme;
+type ThemeKey = 'light' | 'dark';
 
-const themes = {
+const themes: Record<ThemeKey, ThemeType> = {
   light: lightTheme,
   dark: darkTheme,
 };
 
 type ThemeContextType = {
-  theme: typeof lightTheme;
+  theme: ThemeType;
   toggleTheme: () => void;
   resetTheme: () => void;
+  navigationTheme: NavTheme;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: themes.light,
+  theme: themes.dark,
   toggleTheme: () => {},
   resetTheme: () => {},
+  navigationTheme: {
+    ...NavDefaultTheme,
+    colors: { ...NavDefaultTheme.colors, ...themes.light.colors },
+    fonts: NavDefaultTheme.fonts,
+  },
 });
 
 export const useTheme = () => useContext(ThemeContext);
 
+const STORAGE_KEY = 'theme';
+
 export const ThemeContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeType>(themes.light);
-
-  const saveThemeToStorage = async (theme: ThemeType) => {
-    try {
-      await AsyncStorage.setItem('theme', theme.dark ? 'dark' : 'light');
-    } catch (e) {
-      console.error('Error saving theme to storage', e);
-    }
-  };
-
-  const loadThemeFromStorage = async () => {
-    try {
-      const savedTheme = await AsyncStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        setTheme(themes.dark);
-      } else {
-        setTheme(themes.light);
-      }
-    } catch (e) {
-      console.error('Error loading theme from storage', e);
-    }
-  };
-
-  const toggleTheme = () => {
-    const newTheme = theme.dark ? themes.light : themes.dark;
-    setTheme(newTheme);
-    saveThemeToStorage(newTheme);
-  };
-
-  const resetTheme = () => {
-    setTheme(themes.light);
-    AsyncStorage.removeItem('theme');
-  };
+  const [theme, setTheme] = useState<ThemeType>(themes.dark);
 
   useEffect(() => {
-    loadThemeFromStorage();
+    (async () => {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY);
+      setTheme(saved === 'dark' ? themes.dark : themes.light);
+    })();
   }, []);
 
+  const toggleTheme = async () => {
+    const newKey: ThemeKey = theme.dark ? 'light' : 'dark';
+    const newTheme = themes[newKey];
+    setTheme(newTheme);
+    await AsyncStorage.setItem(STORAGE_KEY, newKey);
+  };
+
+  const resetTheme = async () => {
+    setTheme(themes.light);
+    await AsyncStorage.removeItem(STORAGE_KEY);
+  };
+
+  // Theme compatible con React Navigation
+  const navigationTheme: NavTheme = {
+    ...(theme.dark ? NavDarkTheme : NavDefaultTheme),
+    colors: {
+      ...(theme.dark ? NavDarkTheme.colors : NavDefaultTheme.colors),
+      ...theme.colors,
+    },
+    fonts: (theme.dark ? NavDarkTheme.fonts : NavDefaultTheme.fonts),
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, resetTheme }}>
-      <NavigationThemeProvider value={theme}>{children}</NavigationThemeProvider>
+    <ThemeContext.Provider value={{ theme, toggleTheme, resetTheme, navigationTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 };

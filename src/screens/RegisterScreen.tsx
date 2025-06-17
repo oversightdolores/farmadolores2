@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Text, ActivityIndicator,
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 
 

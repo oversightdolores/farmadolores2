@@ -6,7 +6,7 @@ import SkeletonCard from '../skeleton/SkeletonCard';
 import { DateTime } from 'luxon';
 import { useTheme } from '../context/ThemeContext';
 import TurnoCard from './TurnoCard';
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 const Turno: React.FC = () => {
   const { theme } = useTheme();

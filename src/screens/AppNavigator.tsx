@@ -18,7 +18,6 @@ import Profile from './Profile';
 import OnboardingScreen from '../onboarding/OnboardingScreen';
 import { lightTheme, darkTheme } from '../theme';
 import { useColorScheme } from 'react-native';
-import {  ThemeContextProvider, useTheme } from '../context/ThemeContext';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Locales from './Locales';
 import LocalDetailScreen from './LocalDetailScreen';
@@ -27,6 +26,8 @@ import { PharmacyProvider } from '../context/PharmacyContext';
 import EditProfileScreen from './EditProfileScreen';
 import ReportProblemScreen from './ReportProblemScreen';
 import HelpScreen from './HelpScreen';
+import { useTheme } from '../context/ThemeContext';
+import AdScreen from '../components/ads/AdScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -76,13 +77,15 @@ const AppStack = () => {
       <Stack.Screen name="Detail" component={DetailScreen} options={({ route }) => ({ title: route.params.farmacia.name })} />
       <Stack.Screen name="DetailE" component={DetailE} options={({ route }) => ({ title: route.params.emergencia.name })} />
     </Stack.Navigator>
+    <AdScreen />
+
     </>
   );
 };
 
 const AppNavigator: React.FC = ({ ...rest }) => {
   const { user } = useAuth();
-  const {theme} = useTheme()
+  const { navigationTheme } = useTheme();
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -103,11 +106,11 @@ const AppNavigator: React.FC = ({ ...rest }) => {
 
   if (isFirstLaunch === null) {
     return null; // Puedes mostrar una pantalla de carga aquí
-  }
+  } 
 
   return (
-    <NavigationContainer theme={theme}>
-      <Stack.Navigator {...rest}>
+    <NavigationContainer theme={navigationTheme}>
+      <Stack.Navigator >
         {isFirstLaunch ? (
           <Stack.Screen name="Onboarding" options={{ headerShown: false }}>
             {props => <OnboardingStack {...props} setIsFirstLaunch={setIsFirstLaunch} />}
@@ -126,10 +129,8 @@ const AppNavigator: React.FC = ({ ...rest }) => {
 
 export default () => (
   <AuthContextProvider>
-    <ThemeContextProvider>
-      <PharmacyProvider>
-    <AppNavigator />
-      </PharmacyProvider>
-    </ThemeContextProvider>
+    <PharmacyProvider>
+      <AppNavigator />
+    </PharmacyProvider>
   </AuthContextProvider>
 );

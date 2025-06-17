@@ -1,9 +1,8 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import Icon from '@react-native-vector-icons/material-design-icons';
+import { useTheme } from '../context/ThemeContext'; // Adjust the import path as necessary
 interface AnimatedToggleSwitchProps {
   isOn: boolean;
   onToggle: () => void;
@@ -11,16 +10,12 @@ interface AnimatedToggleSwitchProps {
 
 const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({ isOn, onToggle }) => {
   const translateX = useSharedValue(isOn ? 30 : 0);
+  const { theme } = useTheme();
+  const { colors } = theme;
 
-  const handleGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-    if (event.nativeEvent.translationX > 10) {
-      translateX.value = withSpring(30);
-      if (!isOn) onToggle();
-    } else if (event.nativeEvent.translationX < -10) {
-      translateX.value = withSpring(0);
-      if (isOn) onToggle();
-    }
-  };
+  React.useEffect(() => {
+    translateX.value = withSpring(isOn ? 30 : 0);
+  }, [isOn]);
 
   const rStyle = useAnimatedStyle(() => {
     return {
@@ -29,13 +24,11 @@ const AnimatedToggleSwitch: React.FC<AnimatedToggleSwitchProps> = ({ isOn, onTog
   });
 
   return (
-    <PanGestureHandler onGestureEvent={handleGestureEvent}>
-      <View style={styles.container}>
-        <Animated.View style={[styles.circle, rStyle]}>
-          <Icon name={isOn ? "brightness-7" : "brightness-2"} size={24} color="#fff" />
-        </Animated.View>
-      </View>
-    </PanGestureHandler>
+    <TouchableOpacity onPress={onToggle} activeOpacity={0.7} style={styles.container}>
+      <Animated.View style={[styles.circle, rStyle]}>
+        <Icon name={isOn ? "brightness-7" : "brightness-2"} size={24} color={colors.text} />
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 

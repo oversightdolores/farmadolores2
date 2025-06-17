@@ -13,13 +13,14 @@ import { OnboardingData } from './data';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigationTypes';
 import { requestPermissions } from '../components/Permissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = {
   dataLength: number;
   flatListIndex: SharedValue<number>;
   flatListRef: AnimatedRef<FlatList<OnboardingData>>;
   x: SharedValue<number>;
-  setIsFirstLaunch: (value: boolean) => void;
+  setIsFirstLaunch: React.Dispatch<React.SetStateAction<boolean | null>>;
 };
 
 const CustomButton = ({ flatListRef, flatListIndex, dataLength, x, setIsFirstLaunch }: Props) => {
@@ -33,7 +34,8 @@ const CustomButton = ({ flatListRef, flatListIndex, dataLength, x, setIsFirstLau
       const granted = await requestPermissions();
       if (granted) {
         setIsFirstLaunch(false);
-      
+        // Persistencia para que no vuelva a aparecer el onboarding
+        await AsyncStorage.setItem('hasOpenedBefore', 'true');
       }
     }
   };

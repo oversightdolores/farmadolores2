@@ -17,12 +17,14 @@ export interface NotificationData {
  * @param body  Texto de la notificación
  * @param data  Objeto con información adicional
  * @param trigger Objeto TimestampTrigger para programar notificación futura
+ * @param notificationId ID único para la notificación (opcional)
  */
 export const showNotification = async (
   title: string,
   body: string,
   data: NotificationData,
   trigger: TimestampTrigger,
+  notificationId?: string,
 ): Promise<void> => {
   // Creamos una notificación con trigger (programada)
   await notifee.createTriggerNotification(
@@ -51,7 +53,8 @@ export const showNotification = async (
         // pones el timestamp. Pero usualmente con programadas no hace falta.
         timestamp: Date.now() + 5 * 1000,
       },
-      data,
+      data: { ...data },
+      id: notificationId,
     },
     trigger
   );

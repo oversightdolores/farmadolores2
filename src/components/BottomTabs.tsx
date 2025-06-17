@@ -1,8 +1,8 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 import { useTheme } from '../context/ThemeContext';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Para Material Design
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Para FontAwesome
+
 import Emergencias from '../screens/Emergencias';
 import Farmacias from '../screens/Farmacias';
 import Home from '../screens/Home';
@@ -17,14 +17,11 @@ type TabBarIconProps = {
 const Tab = createBottomTabNavigator();
 
 const BottomTabs: React.FC = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const { colors } = theme;
 
   useEffect(() => {
-    // Aquí puedes colocar las llamadas a las funciones fetch si las necesitas
-    // Ejemplo: dispatch(fetchFarmacias());
-    // dispatch(fetchEmergencias());
-    // dispatch(fetchPublicidad());
+    // Podés cargar datos acá si lo necesitás
   }, []);
 
   return (
@@ -32,32 +29,32 @@ const BottomTabs: React.FC = () => {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }: TabBarIconProps) => {
           let iconName: string;
-          let IconComponent = Icon;
 
           switch (route.name) {
             case 'Home':
-              iconName = 'home';
-              IconComponent = Icon;
+              iconName = 'home-variant';
               break;
             case 'Farmacias':
-              iconName = 'medkit';
-              IconComponent = FontAwesome;
+              iconName = 'medical-bag';
               break;
             case 'Emergencias':
-              iconName = 'phone';
-              IconComponent = FontAwesome;
+              iconName = 'ambulance';
               break;
             case 'Perfil':
-              iconName = 'user';
-              IconComponent = FontAwesome;
+              iconName = 'account';
               break;
             default:
-              iconName = 'circle';
-              IconComponent = Icon;
+              iconName = 'help-circle-outline';
               break;
           }
 
-          return <IconComponent name={iconName} size={size} color={focused ? colors.iconActive : colors.iconInactive} />;
+          return (
+            <MaterialDesignIcons
+              name={iconName}
+              size={size}
+              color={focused ? colors.iconActive : colors.iconInactive}
+            />
+          );
         },
         tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
@@ -70,9 +67,9 @@ const BottomTabs: React.FC = () => {
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Farmacias" options={{ headerShown: false }} component={Farmacias} />
-      <Tab.Screen name="Emergencias" options={{ headerShown: false }} component={Emergencias} />
-      <Tab.Screen name="Perfil"  options={{ headerShown: false }} component={Perfil} />
+      <Tab.Screen name="Farmacias" component={Farmacias} options={{ headerShown: false }} />
+      <Tab.Screen name="Emergencias" component={Emergencias} options={{ headerShown: false }} />
+      <Tab.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 };
