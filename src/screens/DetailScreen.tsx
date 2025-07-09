@@ -1,12 +1,61 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigationTypes'; // Ajusta la ruta según tu estructura de archivos
+import { RootStackParamList } from '../types/navigationTypes';
 import { useTheme } from '../context/ThemeContext';
 import MapView, { Marker } from 'react-native-maps';
 import { GeoPoint } from 'firebase/firestore';
 import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
+
+const DIAS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// --- Tabla de horarios, full theme ---
+function HorarioTable({ horarios }: { horarios?: any }) {
+  const { theme } = useTheme();
+  const { colors } = theme;
+  if (!horarios || typeof horarios !== 'object') {
+    return (
+      <Text style={{
+        color: colors.error || '#dc3545',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10
+      }}>
+        Sin horarios registrados
+      </Text>
+    );
+  }
+  return (
+    <View style={[
+      styles.horarioTable,
+      { backgroundColor: colors.card, borderColor: colors.border }
+    ]}>
+      <View style={[styles.horarioRow, { backgroundColor: colors.primary + '11' }]}>
+        <Text style={[styles.horarioDia, styles.horarioHeader, { color: colors.primary }]}>Día</Text>
+        <Text style={[styles.horarioFranjas, styles.horarioHeader, { color: colors.primary }]}>Horario</Text>
+      </View>
+      {DIAS.map(dia => {
+        const franjas = horarios[dia];
+        return (
+          <View key={dia} style={[styles.horarioRow, { borderColor: colors.border }]}>
+            <Text style={[styles.horarioDia, { color: colors.text }]}>{capitalize(dia)}</Text>
+            <Text style={[styles.horarioFranjas, { color: colors.text }]}>
+              {Array.isArray(franjas) && franjas.length
+                ? franjas.map(f => `${f.abre} - ${f.cierra}`).join(' / ')
+                : <Text style={{ color: colors.disabled || '#888' }}>Cerrado</Text>
+              }
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -16,43 +65,63 @@ const DetailScreen = () => {
   const route = useRoute<DetailScreenRouteProp>();
   const { farmacia } = route.params;
 
-  // Extrae latitud y longitud del geopoint de Firebase
-  const { latitude, longitude } = (farmacia.gps as GeoPoint).toJSON();
+  let latitude = 0, longitude = 0;
+  if (farmacia.gps && typeof farmacia.gps.toJSON === 'function') {
+    ({ latitude, longitude } = farmacia.gps.toJSON());
+  }
 
   const makeCall = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`);
   };
-  
+
+  const tieneHorariosNuevos = farmacia.horarios && typeof farmacia.horarios === 'object';
 
   return (
     <>
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: farmacia.image }} style={styles.image} />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Text style={[styles.title, { color: colors.text }]}>{farmacia.name}</Text>
-        <Text style={[styles.info, { color: colors.text }]}>Dirección: {farmacia.dir}</Text>
-        <TouchableOpacity onPress={() => makeCall(farmacia.tel)}>
-          <Text style={[styles.info, { color: colors.text, textDecorationLine: 'underline' }]}>Teléfono: {farmacia.tel}</Text>
-        </TouchableOpacity>
-        <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {farmacia.horarioAperturaMañana?.toDate().toLocaleTimeString()} - {farmacia.horarioCierreMañana?.toDate().toLocaleTimeString()}</Text>
-        <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {farmacia.horarioAperturaTarde?.toDate().toLocaleTimeString()} - {farmacia.horarioCierreTarde?.toDate().toLocaleTimeString()}</Text>
-      </View>
-      <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude,
-            longitude,
-            latitudeDelta: 0.020,
-            longitudeDelta: 0.010,
-          }}
-          >
-          <Marker coordinate={{ latitude, longitude }} title={farmacia.name} />
-        </MapView>
-      </View>
-    </ScrollView>
-    <AdBanner size={BannerAdSize.FULL_BANNER} />
-          </>
+      <ScrollView contentContainerStyle={[{ backgroundColor: colors.background }, styles.container]}>
+        <Image source={{ uri: farmacia.image }} style={[styles.image, { borderColor: colors.border }]} />
+        <View style={[styles.card, { backgroundColor: colors.card, shadowColor: '#000' }]}>
+          <Text style={[styles.title, { color: colors.text }]}>{farmacia.name}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Dirección: {farmacia.dir}</Text>
+          <TouchableOpacity onPress={() => makeCall(farmacia.tel)}>
+            <Text style={[styles.info, { color: colors.success || '#388e3c', textDecorationLine: 'underline', fontWeight: 'bold' }]}>Teléfono: {farmacia.tel}</Text>
+          </TouchableOpacity>
+          <Text style={[styles.subTitle, { color: colors.primary, marginTop: 15, marginBottom: 5 }]}>Horarios de atención:</Text>
+          {tieneHorariosNuevos ? (
+            <HorarioTable horarios={farmacia.horarios} />
+          ) : (
+            <>
+              <Text style={[styles.info, { color: colors.text }]}>
+                Mañana: {farmacia.horarioAperturaMañana?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {farmacia.horarioCierreMañana?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+              <Text style={[styles.info, { color: colors.text }]}>
+                Tarde: {farmacia.horarioAperturaTarde?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {farmacia.horarioCierreTarde?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </>
+          )}
+        </View>
+        {latitude && longitude && (
+          <View style={[styles.mapContainer, { borderColor: colors.border }]}>
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude,
+                longitude,
+                latitudeDelta: 0.020,
+                longitudeDelta: 0.010,
+              }}
+              scrollEnabled={false}
+              zoomEnabled={false}
+              pitchEnabled={false}
+              rotateEnabled={false}
+            >
+              <Marker coordinate={{ latitude, longitude }} title={farmacia.name} />
+            </MapView>
+          </View>
+        )}
+      </ScrollView>
+      <AdBanner size={BannerAdSize.FULL_BANNER} />
+    </>
   );
 };
 
@@ -61,46 +130,79 @@ export default DetailScreen;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: 10,
   },
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    height: 300,
+    borderRadius: 18,
+    marginBottom: 22,
+    borderWidth: 1.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.13,
+    shadowRadius: 7,
   },
   card: {
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    borderRadius: 14,
+    padding: 22,
+    marginBottom: 22,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.09,
+    shadowRadius: 7,
+    elevation: 6,
   },
   title: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 8,
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   info: {
-    fontSize: 18,
-    marginBottom: 5,
+    fontSize: 17,
+    marginBottom: 4,
   },
   mapContainer: {
-    height: Dimensions.get('window').height * 0.3, // Ajusta la altura del mapa
-    borderRadius: 10,
+    height: Dimensions.get('window').height * 0.29,
+    borderRadius: 13,
     overflow: 'hidden',
+    marginTop: 10,
+    marginBottom: 24,
+    borderWidth: 1,
   },
   map: {
     width: '100%',
     height: '100%',
+  },
+  horarioTable: {
+    borderWidth: 1,
+    borderRadius: 8,
+    marginTop: 2,
+    marginBottom: 15,
+    overflow: 'hidden',
+  },
+  horarioRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    alignItems: 'center',
+    paddingVertical: 7,
+    paddingHorizontal: 9,
+  },
+  horarioHeader: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  horarioDia: {
+    width: 110,
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  horarioFranjas: {
+    flex: 1,
+    fontSize: 15,
+    marginLeft: 4,
   },
 });

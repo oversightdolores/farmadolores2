@@ -28,6 +28,9 @@ import ReportProblemScreen from './ReportProblemScreen';
 import HelpScreen from './HelpScreen';
 import { useTheme } from '../context/ThemeContext';
 import AdScreen from '../components/ads/AdScreen';
+import { BotonActualizarHorariosTodos } from '../components/BotonActualizarHorariosTodos';
+import AdminTurnosScreen from './AdminTurnScreen';
+import AdminPanelScreen from './adminPanelScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -69,13 +72,16 @@ const AppStack = () => {
       <Stack.Screen name="Settings" component={SettingsScreen} options={{headerShown: false}} />
       <Stack.Screen name="PrimeroAuxilios" component={PrimerosAuxilios}  />
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false, title: 'Perfil' }} />
-      <Stack.Screen name="Local" component={Locales} options={{ title: 'Locales' }} />
+      <Stack.Screen name="Local" component={Locales} options={{headerShown: false}} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{title: 'Editar perfil'}} />
       <Stack.Screen name="ReportProblem" component={ReportProblemScreen} options={{title: 'Reportar Problema'}} />
-      <Stack.Screen name="Help" component={HelpScreen} options={{title: 'Ayuda'}} />
-      <Stack.Screen name="LocalDetail" component={LocalDetailScreen} options={{ title: 'Detalles del Local' }} />
-      <Stack.Screen name="Detail" component={DetailScreen} options={({ route }) => ({ title: route.params.farmacia.name })} />
-      <Stack.Screen name="DetailE" component={DetailE} options={({ route }) => ({ title: route.params.emergencia.name })} />
+      <Stack.Screen name="Help" component={HelpScreen} options={{headerShown: false}} />
+      <Stack.Screen name="ActualizarHorarios" component={BotonActualizarHorariosTodos} options={{headerShown: false}} />
+      <Stack.Screen name="Admin" component={AdminPanelScreen} options={{headerShown: false}} />
+      <Stack.Screen name="ActualizarTurnos" component={AdminTurnosScreen} options={{title: 'Turnos'}} />
+      <Stack.Screen name="LocalDetail" component={LocalDetailScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Detail" component={DetailScreen} options={{headerShown: false}} />
+      <Stack.Screen name="DetailE" component={DetailE} options={{headerShown: false}} />
     </Stack.Navigator>
     <AdScreen />
 

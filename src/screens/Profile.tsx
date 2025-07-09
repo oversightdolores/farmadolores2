@@ -9,11 +9,13 @@ import { RootStackParamList } from '../types/navigationTypes';
 import AdBanner from '../components/ads/AdBanner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 import SettingsScreen from './SettingsScreen';
+import { BotonActualizarHorariosTodos } from '../components/BotonActualizarHorariosTodos';
 
 const Profile: React.FC = () => {
   //const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, logout, loading } = useAuth();
   const { toggleTheme } = useTheme();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
   const { colors } = theme;
   const drawerRef = useRef<DrawerLayoutAndroid>(null);
@@ -24,6 +26,7 @@ const Profile: React.FC = () => {
     Linking.openURL(cafecitoLink);
   };
 
+  console.log('user', user)
   return (
     <DrawerLayoutAndroid
       ref={drawerRef}
@@ -65,9 +68,19 @@ const Profile: React.FC = () => {
           <Text style={[styles.cafecitoButtonText, {color: colors.text}]}>Donar en Cafecito</Text>
         </TouchableOpacity>
       </View>
+
         </View>
-        
+        {user?.email === 'logiudicenicolas04@gmail.com' && (
+            <TouchableOpacity
+              style={styles.adminEditButton}
+              onPress={() => navigation.navigate('Admin')}
+            >
+              <Icon name="tag-edit" size={20} color="#fff" />
+              <Text style={styles.adminEditButtonText}>Editar horarios de farmacias</Text>
+            </TouchableOpacity>
+          )}
       </View>
+        
       <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
     </DrawerLayoutAndroid>
   );
@@ -136,6 +149,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 15,
   },
+  adminEditButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2d6cdf',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+    elevation: 2,
+  },
+  adminEditButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  
   buttonText: {
     marginLeft: 10,
     color: '#333',

@@ -2,6 +2,7 @@ import { FirebaseFirestoreTypes, Timestamp } from '@react-native-firebase/firest
 import { GeoPoint } from 'firebase/firestore';
 
 export type Farmacia = {
+  horarios: boolean;
   id: string;
   name: string;
   dir: string;
@@ -12,15 +13,15 @@ export type Farmacia = {
   horarioAperturaTarde?: Timestamp;
   horarioCierreTarde?: Timestamp;
   detail: string;
-  turn: Turno[];
+  turn: Turno;
   gps: GeoPoint;
 };
 
 
-export type Turno = {
-  dia: string;
-  horario: string;
-};
+export type Turno = [
+  dia: Timestamp,
+  horario: Timestamp
+];
 export type FarmaciaConTiempos = {
   id: string;
   name: string;
@@ -60,6 +61,9 @@ export type RootStackParamList = {
   Home: undefined;
   Farmacias: undefined;
   Emergencias: undefined;
+  Admin: undefined;
+  ActualizarHorarios: undefined;
+  ActualizarTurnos: undefined;
   DetailScreen: {
     name: string;
     dir: string;

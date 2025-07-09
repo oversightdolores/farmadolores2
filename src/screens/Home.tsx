@@ -1,86 +1,82 @@
 import React from 'react';
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import Turno from '../components/Turno';
 import AdScreen from '../components/ads/AdScreen';
 import AdBanner from '../components/ads/AdBanner';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigationTypes'; // Asegúrate de que la ruta sea correcta
-import { BannerAdSize } from 'react-native-google-mobile-ads';
+import { RootStackParamList } from '../types/navigationTypes';
 import SkeletonCard from '../skeleton/SkeletonCard';
 import { usePharmacies } from '../context/PharmacyContext';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 const Home = () => {
- const { loading } = usePharmacies();
+  const { loading } = usePharmacies();
   const { theme } = useTheme();
   const { colors } = theme;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const handlePress = () => {
-    navigation.navigate('PrimeroAuxilios'); // Asegúrate de que 'PrimerosAuxilios' sea el nombre correcto de tu pantalla en la navegación
-  };
-  const localesPress = () => {
-    navigation.navigate('Local'); // Asegúrate de que 'Locales' sea el nombre correcto de tu pantalla en la navegación
-  };
- 
+  const handlePress = () => navigation.navigate('PrimeroAuxilios');
+  const localesPress = () => navigation.navigate('Local');
 
   return (
-    <>
-      <AdBanner size={BannerAdSize.FULL_BANNER} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar
         backgroundColor={colors.background}
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
       />
-    { loading ? (
-      <SkeletonCard />
-    ) : (
-        <>
-      <Turno />
-
-        </>
-      )}
-      <View style={styles.container}>
-      <TouchableOpacity
-          style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
-          onPress={handlePress}
-        >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Ver Primeros Auxilios
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
-          onPress={localesPress}
-        >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Ver Locales
-          </Text>
-        </TouchableOpacity>
-        <View style={{ marginTop: 20 }}>
-      <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        
+          <AdBanner size={BannerAdSize.FULL_BANNER} />
+        
+        {loading ? (
+          <SkeletonCard />
+        ) : (
+          <Turno />
+        )}
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
+            onPress={handlePress}
+            accessibilityLabel="Ver primeros auxilios"
+          >
+            <Text style={[styles.buttonText, { color: colors.text }]}>Ver Primeros Auxilios</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}
+            onPress={localesPress}
+            accessibilityLabel="Ver locales"
+          >
+            <Text style={[styles.buttonText, { color: colors.text }]}>Ver Locales</Text>
+          </TouchableOpacity>
+          <View style={{ marginTop: 24 }}>
+            <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
+          </View>
         </View>
-      </View>
-
-      <AdScreen /> 
-      </>
-
-
-);
+        {/* Puedes poner más cosas abajo si quieres */}
+      </ScrollView>
+      <AdScreen />
+    </SafeAreaView>
+  );
 };
 
-export default Home;
-
 const styles = StyleSheet.create({
+  scrollContainer: {
+    //flexGrow: 1,
+    justifyContent: 'flex-start',
+    paddingBottom: 32,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
+    width: '100%',
   },
   button: {
-    width: '90%',
+    width: '95%',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
@@ -92,3 +88,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default Home;

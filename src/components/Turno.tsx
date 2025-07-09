@@ -1,5 +1,4 @@
-// Turno.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { usePharmacies } from '../context/PharmacyContext';
 import SkeletonCard from '../skeleton/SkeletonCard';
@@ -12,31 +11,61 @@ const Turno: React.FC = () => {
   const { theme } = useTheme();
   const { colors } = theme;
   const { farmacias, loading, fetchPharmacies } = usePharmacies();
+  const [error, setError] = useState<string | null>(null);
   const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
 
-  // Si está cargando, muestra el Skeleton
   if (loading) {
     return <SkeletonCard />;
   }
 
-  // Lógica para encontrar la farmacia de turno
-  const matchingPharmacy = farmacias.find((pharmacy) =>
-    pharmacy.turn.some((t) => {
-      const turnStart = DateTime.fromJSDate(t.toDate()).set({
-        hour: 8,
-        minute: 30,
-        second: 0,
-        millisecond: 0,
+  let matchingPharmacy = undefined;
+console.log('farmacias: ', farmacias)
+  try {
+    matchingPharmacy = farmacias?.find((pharmacy) => {
+      if (!Array.isArray(pharmacy?.turn)) return false;
+      return pharmacy.turn.some((t) => {
+        if (!t || typeof t.toDate !== 'function') return false;
+        let turnStart;
+        try {
+          turnStart = DateTime.fromJSDate(t.toDate()).set({
+            hour: 8,
+            minute: 30,
+            second: 0,
+            millisecond: 0,
+          });
+        } catch {
+          return false;
+        }
+        const turnEnd = turnStart.plus({ hours: 24 });
+        return now >= turnStart && now <= turnEnd;
       });
-      const turnEnd = turnStart.plus({ hours: 24 });
-      return now >= turnStart && now <= turnEnd;
-    })
-  );
+    });
+  } catch (e: any) {
+    // Si la lógica crashea, lo mostramos bonito
+    setError('Ocurrió un error mostrando la farmacia de turno.');
+  }
 
-  // Botón que dispara el fetch manual
   const handleReload = () => {
+    setError(null);
     fetchPharmacies();
   };
+
+  if (error) {
+    return (
+      <View style={styles.noTurnos}>
+        <Text style={[styles.noTurnosText, { color: colors.text }]}>
+          {error}
+        </Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.card }]}
+          onPress={handleReload}
+        >
+          <Icon name="reload" size={40} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+  console.log('matchFarm: ', matchingPharmacy)
 
   return (
     <View style={styles.container}>
@@ -51,13 +80,15 @@ const Turno: React.FC = () => {
             style={[styles.button, { backgroundColor: colors.card }]}
             onPress={handleReload}
           >
-            <Icon name="reload1" size={40} color={colors.text} />
+            <Icon name="reload" size={40} color={colors.text} />
           </TouchableOpacity>
         </View>
       )}
     </View>
   );
 };
+
+
 
 export default Turno;
 

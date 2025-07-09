@@ -1,86 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { DateTime } from 'luxon';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList, Farmacia } from '../types/navigationTypes';
-import { NavigationProp } from '@react-navigation/native';
+import { DateTime } from 'luxon';
 import { useTheme } from '../context/ThemeContext';
+import { RootStackParamList, Farmacia as FarmaciaType } from '../types/navigationTypes';
+import { NavigationProp } from '@react-navigation/native';
 
+type Status = 'Abierto' | 'CierraPronto' | 'Cerrado';
 
-type Status = 'Abierto' | 'Cierra Pronto' | 'Cerrado';
+const ZONA = 'America/Argentina/Buenos_Aires';
+const AVISO_MINUTOS = 30;
+const DIAS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+
+function getHoyInfo(horarios: any) {
+  const now = DateTime.local().setZone(ZONA);
+  const diaIndex = now.weekday - 1; // 0 (lunes) - 6 (domingo)
+  const diaNombre = DIAS[diaIndex];
+  return {
+    diaNombre,
+    franjas: (horarios && horarios[diaNombre]) || [],
+  };
+}
+
+function getStatus(horarios: any): Status {
+  const now = DateTime.local().setZone(ZONA);
+  const { franjas } = getHoyInfo(horarios);
+
+  for (const franja of franjas) {
+    if (!franja.abre || !franja.cierra) continue;
+    const [ah, am] = franja.abre.split(':').map(Number);
+    const [ch, cm] = franja.cierra.split(':').map(Number);
+
+    let abre = now.set({ hour: ah, minute: am, second: 0, millisecond: 0 });
+    let cierra = now.set({ hour: ch, minute: cm, second: 0, millisecond: 0 });
+
+    // Si cierra después de las 00:00, sumarle un día
+    if (cierra <= abre) cierra = cierra.plus({ days: 1 });
+
+    if (now >= abre && now < cierra) {
+      if (now >= cierra.minus({ minutes: AVISO_MINUTOS })) return "CierraPronto";
+      return "Abierto";
+    }
+  }
+  return "Cerrado";
+}
+
+function printFranjas(franjas: { abre: string, cierra: string }[]) {
+  if (!franjas.length) return "Cerrado";
+  return franjas.map(f =>
+    `${f.abre} - ${f.cierra}`
+  ).join(" / ");
+}
 
 type FarmaciaCardProps = {
-  item: Farmacia;
-  onPress: (item: Farmacia) => void;
+  item: FarmaciaType & { horarios?: any };
+  onPress?: (item: FarmaciaType) => void;
 };
 
-const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { theme } = useTheme();
-  const { colors } = theme;
-  const { name, dir, tel, horarioAperturaMañana, horarioCierreMañana, horarioAperturaTarde, horarioCierreTarde, detail } = item;
-  const [status, setStatus] = useState<Status>('Cerrado');
-
-  const getCurrentStatus = () => {
-    if (
-      !horarioAperturaMañana ||
-      !horarioCierreMañana ||
-      !horarioAperturaTarde ||
-      !horarioCierreTarde
-    ) {
-      return 'Cerrado';
-    }
-
-    const now = DateTime.local().setZone('America/Argentina/Buenos_Aires');
-    
-
-    const aperturaMañana = DateTime.fromFormat(horarioAperturaMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const cierreMañana = DateTime.fromFormat(horarioCierreMañana.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const aperturaTarde = DateTime.fromFormat(horarioAperturaTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    const cierreTarde = DateTime.fromFormat(horarioCierreTarde.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }), 'HH:mm', { zone: 'America/Argentina/Buenos_Aires' });
-    
-    const minutosAntesDeCerrar = 30;
-    const cierraProntoMañana = cierreMañana.minus({ minutes: minutosAntesDeCerrar });
-    const cierraProntoTarde = cierreTarde.minus({ minutes: minutosAntesDeCerrar });
-
-    if ((now >= aperturaMañana && now < cierraProntoMañana) || (now >= aperturaTarde && now < cierraProntoTarde)) {
-      return 'Abierto';
-    } else if ((now >= cierraProntoMañana && now < cierreMañana) || (now >= cierraProntoTarde && now < cierreTarde)) {
-      return 'Cierra Pronto';
-    } else {
-      return 'Cerrado';
-    }
-  };
-
-  useEffect(() => {
-    setStatus(getCurrentStatus());
-    const intervalId = setInterval(() => {
-      setStatus(getCurrentStatus());
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [horarioAperturaMañana, horarioCierreMañana, horarioAperturaTarde, horarioCierreTarde]);
-
-  return (
-    <TouchableOpacity onPress={() => navigation.navigate('Detail', { farmacia: item })}>
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Image source={{ uri: detail }} style={styles.image} />
-        <View style={styles.infoContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Horario Mañana: {horarioAperturaMañana?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - {horarioCierreMañana?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</Text>
-          <Text style={[styles.info, { color: colors.text }]}>Horario Tarde: {horarioAperturaTarde?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - {horarioCierreTarde?.toDate().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</Text>
-        </View>
-        <View style={[styles.statusBadge, statusStyles[status]]}>
-          <Text style={styles.statusText}>{status}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-export default FarmaciaCard;
+const statusStyles = StyleSheet.create({
+  Abierto: { backgroundColor: '#28a745' },
+  CierraPronto: { backgroundColor: '#ffc107' },
+  Cerrado: { backgroundColor: '#dc3545' },
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -92,10 +73,12 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 20,
     overflow: 'hidden',
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: 150,
+    height: 200,
+    backgroundColor: '#eee',
   },
   infoContainer: {
     padding: 20,
@@ -123,14 +106,53 @@ const styles = StyleSheet.create({
   },
 });
 
-const statusStyles = StyleSheet.create({
-  Abierto: {
-    backgroundColor: '#28a745',
-  },
-  'Cierra Pronto': {
-    backgroundColor: '#ffc107',
-  },
-  Cerrado: {
-    backgroundColor: '#dc3545',
-  },
-});
+const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
+
+const FarmaciaCard: React.FC<FarmaciaCardProps> = ({ item, onPress }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { theme } = useTheme();
+  const { colors } = theme;
+  const { name, dir, tel, detail, horarios } = item as any;
+
+  const [status, setStatus] = useState<Status>('Cerrado');
+  const [diaNombre, setDiaNombre] = useState('');
+  const [hoyFranjas, setHoyFranjas] = useState<{ abre: string, cierra: string }[]>([]);
+
+  useEffect(() => {
+    const update = () => {
+      setStatus(getStatus(horarios));
+      const { diaNombre, franjas } = getHoyInfo(horarios);
+      setDiaNombre(diaNombre);
+      setHoyFranjas(franjas);
+    };
+    update();
+    const intervalId = setInterval(update, 30 * 1000);
+    return () => clearInterval(intervalId);
+  }, [horarios]);
+
+  return (
+    <TouchableOpacity
+      onPress={() =>  navigation.navigate('Detail', { farmacia: item })}
+    >
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Image source={{ uri: detail }} style={styles.image} />
+        <View style={styles.infoContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Dirección: {dir}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>Teléfono: {tel}</Text>
+          <Text style={[styles.info, { color: colors.text }]}>
+            <Text style={{ fontWeight: 'bold' }}>
+              Horarios de {capitalize(diaNombre)}:
+            </Text> {printFranjas(hoyFranjas)}
+          </Text>
+        </View>
+        <View style={[styles.statusBadge, statusStyles[status]]}>
+          <Text style={styles.statusText}>{status === 'CierraPronto' ? 'Cierra Pronto' : status}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export default FarmaciaCard;
